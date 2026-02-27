@@ -1,798 +1,2045 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Nissi Tech — Workers</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
-<style>
-:root {
-  --bg: #04070f;
-  --s1: #0a1628;
-  --s2: #0e1c32;
-  --s3: #12223c;
-  --border: #1a2e48;
-  --border2: #243d5e;
-  --blue: #3d8ef5;
-  --blue2: #5aa3ff;
-  --blue-glow: rgba(61,142,245,0.18);
-  --blue-glow2: rgba(61,142,245,0.06);
-  --green: #22c98a;
-  --green2: #30e09a;
-  --green-glow: rgba(34,201,138,0.15);
-  --gold: #e8b84b;
-  --gold2: #f5d080;
-  --gold-glow: rgba(232,184,75,0.12);
-  --text: #dde8f8;
-  --text2: #7a94b3;
-  --text3: #3d5570;
-  --font: 'DM Sans', sans-serif;
-  --font-display: 'Syne', sans-serif;
-}
-
-*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-
-html { scroll-behavior: smooth; }
-
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: var(--font);
-  min-height: 100vh;
-  padding: 130px 24px 120px;
-  overflow-x: hidden;
-  position: relative;
-}
-
-/* ── CANVAS BG ── */
-#bg-canvas {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  opacity: 0.55;
-}
-
-/* ── AMBIENT GLOWS ── */
-.glow-orb {
-  position: fixed;
-  border-radius: 50%;
-  filter: blur(120px);
-  pointer-events: none;
-  z-index: 0;
-}
-.glow-orb.a { width: 600px; height: 600px; top: -150px; right: -100px; background: radial-gradient(circle, rgba(61,142,245,0.09) 0%, transparent 70%); }
-.glow-orb.b { width: 500px; height: 500px; bottom: 100px; left: -120px; background: radial-gradient(circle, rgba(34,201,138,0.07) 0%, transparent 70%); }
-.glow-orb.c { width: 400px; height: 400px; top: 50%; left: 50%; transform: translate(-50%,-50%); background: radial-gradient(circle, rgba(232,184,75,0.03) 0%, transparent 70%); }
-
-.container {
-  max-width: 1020px;
-  margin: 0 auto;
-  position: relative;
-  z-index: 1;
-}
-
-/* ── HEADER ── */
-header {
-  text-align: center;
-  margin-bottom: 88px;
-}
-
-.brand-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  border: 1px solid var(--border2);
-  border-radius: 100px;
-  padding: 7px 20px;
-  margin-bottom: 36px;
-  background: linear-gradient(135deg, var(--s2), var(--s1));
-  box-shadow: 0 0 0 1px rgba(61,142,245,0.08), inset 0 1px 0 rgba(255,255,255,0.04);
-  animation: fadeUp 0.8s ease both;
-}
-
-.brand-dot {
-  width: 7px; height: 7px;
-  background: var(--green);
-  border-radius: 50%;
-  box-shadow: 0 0 8px var(--green), 0 0 16px rgba(34,201,138,0.4);
-  animation: pulse 2.5s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0%,100% { box-shadow: 0 0 6px var(--green), 0 0 12px rgba(34,201,138,0.3); }
-  50%      { box-shadow: 0 0 12px var(--green), 0 0 24px rgba(34,201,138,0.6); }
-}
-
-.brand-text {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--text3);
-}
-
-h1 {
-  font-family: 'Syne', sans-serif;
-  font-size: clamp(46px, 7.5vw, 84px);
-  font-weight: 800;
-  line-height: 1.0;
-  letter-spacing: -0.025em;
-  color: var(--text);
-  margin-bottom: 22px;
-  animation: fadeUp 0.8s ease 0.1s both;
-}
-
-h1 em {
-  font-style: italic;
-  font-weight: 700;
-  background: linear-gradient(135deg, var(--blue2) 0%, var(--green2) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.subtitle {
-  font-size: 15.5px;
-  color: var(--text2);
-  font-weight: 400;
-  max-width: 500px;
-  margin: 0 auto;
-  line-height: 1.8;
-  animation: fadeUp 0.8s ease 0.2s both;
-}
-
-/* ── GRID ── */
-.grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  margin-bottom: 20px;
-}
-
-@media (max-width: 660px) { .grid { grid-template-columns: 1fr; } }
-
-/* ── CARD BASE ── */
-.card {
-  background: var(--s1);
-  border: 1px solid var(--border);
-  border-radius: 24px;
-  padding: 32px 28px 26px;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-  transition: transform 0.35s cubic-bezier(.22,.68,0,1.2), box-shadow 0.35s ease, border-color 0.35s ease;
-  animation: fadeUp 0.7s ease both;
-}
-
-/* Top edge glow */
-.card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 10%; right: 10%;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--accent-a), var(--accent-b, var(--accent-a)), transparent);
-  opacity: 0.3;
-  transition: opacity 0.35s, left 0.35s, right 0.35s;
-}
-
-/* Corner accent */
-.card::after {
-  content: '';
-  position: absolute;
-  top: -1px; right: -1px;
-  width: 60px; height: 60px;
-  background: radial-gradient(circle at top right, var(--accent-glow, transparent) 0%, transparent 70%);
-  border-radius: 0 24px 0 0;
-  opacity: 0;
-  transition: opacity 0.35s;
-}
-
-.card:hover { transform: translateY(-6px) scale(1.005); border-color: var(--accent-a); box-shadow: 0 0 0 1px var(--accent-a), 0 30px 60px rgba(0,0,0,0.6), 0 0 40px var(--accent-glow, transparent); }
-.card:hover::before { opacity: 1; left: 0; right: 0; }
-.card:hover::after { opacity: 1; }
-
-.card.c1 { --accent-a: var(--blue); --accent-b: var(--blue2); --accent-glow: var(--blue-glow); animation-delay: 0.1s; }
-.card.c2 { --accent-a: var(--green); --accent-b: var(--green2); --accent-glow: var(--green-glow); animation-delay: 0.2s; }
-.card.c3 { --accent-a: var(--blue); --accent-b: var(--blue2); --accent-glow: var(--blue-glow); animation-delay: 0.3s; }
-
-/* ── SALOMÓN CARD ── */
-.card.c4 {
-  --accent-a: var(--gold);
-  --accent-b: var(--gold2);
-  --accent-glow: var(--gold-glow);
-  animation-delay: 0.4s;
-  grid-column: 1 / -1;
-  background: linear-gradient(145deg, #0c1a30 0%, #101f3a 40%, #091520 100%);
-  border-color: rgba(232,184,75,0.2);
-  padding: 36px 32px 30px;
-}
-
-.card.c4:hover {
-  box-shadow: 0 0 0 1px rgba(232,184,75,0.5), 0 32px 64px rgba(0,0,0,0.7), 0 0 80px rgba(232,184,75,0.08);
-}
-
-/* Gold shimmer sweep on Salomón */
-.card.c4 .shimmer {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(105deg, transparent 30%, rgba(232,184,75,0.03) 50%, transparent 70%);
-  background-size: 200% 100%;
-  animation: shimmer 4s ease-in-out infinite;
-}
-
-@keyframes shimmer {
-  0%   { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-
-/* ── CARD INNER ── */
-.card-top {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  margin-bottom: 18px;
-  gap: 12px;
-}
-
-.worker-role-title {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--text3);
-  margin-bottom: 6px;
-}
-
-.worker-name {
-  font-family: 'Syne', sans-serif;
-  font-size: 32px;
-  font-weight: 800;
-  line-height: 1;
-  letter-spacing: -0.02em;
-  color: var(--text);
-}
-
-.card.c4 .worker-name {
-  font-family: 'Syne', sans-serif;
-  font-size: 40px;
-  background: linear-gradient(135deg, var(--gold2) 0%, var(--gold) 60%, #c8963a 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.icon-box {
-  width: 48px; height: 48px;
-  border-radius: 14px;
-  border: 1px solid var(--border2);
-  background: linear-gradient(135deg, var(--s2), var(--s3));
-  display: flex; align-items: center; justify-content: center;
-  font-size: 22px;
-  flex-shrink: 0;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
-  transition: border-color 0.3s, box-shadow 0.3s;
-}
-
-.card:hover .icon-box {
-  border-color: var(--accent-a);
-  box-shadow: 0 0 12px var(--accent-glow, transparent), inset 0 1px 0 rgba(255,255,255,0.05);
-}
-
-.worker-desc {
-  font-size: 13.5px;
-  color: var(--text2);
-  font-weight: 400;
-  line-height: 1.65;
-  margin-bottom: 24px;
-}
-
-.section-label {
-  font-size: 9.5px;
-  font-weight: 800;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--text3);
-  margin-bottom: 12px;
-}
-
-.tasks {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 9px;
-  margin-bottom: 22px;
-}
-
-.tasks li {
-  display: flex;
-  align-items: flex-start;
-  gap: 11px;
-  font-size: 13.5px;
-  color: var(--text2);
-  line-height: 1.5;
-  font-weight: 400;
-}
-
-.tasks li .dot {
-  width: 5px; height: 5px;
-  min-width: 5px;
-  border-radius: 50%;
-  background: var(--accent-a);
-  margin-top: 8px;
-  box-shadow: 0 0 6px var(--accent-glow, transparent);
-  flex-shrink: 0;
-}
-
-.tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 7px;
-  margin-bottom: 22px;
-}
-
-.tag {
-  font-size: 11px;
-  font-weight: 600;
-  padding: 4px 11px;
-  border-radius: 20px;
-  border: 1px solid var(--border2);
-  color: var(--text3);
-  background: var(--s2);
-  letter-spacing: 0.02em;
-  transition: border-color 0.2s, color 0.2s;
-}
-
-.card:hover .tag { border-color: rgba(255,255,255,0.08); color: var(--text2); }
-
-.divider {
-  border: none;
-  border-top: 1px solid var(--border);
-  margin-bottom: 18px;
-}
-
-.card-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.footer-label {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text3);
-  letter-spacing: 0.05em;
-  margin-bottom: 2px;
-}
-
-.footer-sub {
-  font-size: 11.5px;
-  color: var(--text3);
-  font-weight: 300;
-}
-
-.tier {
-  font-size: 12px;
-  font-weight: 700;
-  padding: 6px 16px;
-  border-radius: 20px;
-  letter-spacing: 0.06em;
-  border: 1px solid var(--accent-a);
-  color: var(--accent-a);
-  background: rgba(0,0,0,0.3);
-  text-transform: uppercase;
-  transition: background 0.2s, box-shadow 0.2s;
-}
-
-.card:hover .tier {
-  background: var(--accent-glow, transparent);
-  box-shadow: 0 0 12px var(--accent-glow, transparent);
-}
-
-/* ── SALOMÓN BODY ── */
-.premium-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--gold);
-  background: rgba(232,184,75,0.08);
-  border: 1px solid rgba(232,184,75,0.25);
-  padding: 5px 14px;
-  border-radius: 20px;
-  margin-bottom: 18px;
-  box-shadow: 0 0 16px rgba(232,184,75,0.06);
-}
-
-.sol-body {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 28px;
-}
-
-@media (max-width: 560px) { .sol-body { grid-template-columns: 1fr; } }
-
-.card.c4 .verse-block {
-  margin: 20px 0;
-  padding: 16px 20px;
-  border-left: 2px solid rgba(232,184,75,0.35);
-  background: rgba(232,184,75,0.04);
-  border-radius: 0 10px 10px 0;
-}
-
-.card.c4 .verse-text {
-  font-family: 'DM Sans', sans-serif;
-  font-size: 13px;
-  font-style: italic;
-  color: rgba(232,184,75,0.75);
-  font-weight: 400;
-  line-height: 1.6;
-}
-
-/* ── DETAIL PANEL ── */
-.detail {
-  display: none;
-  background: var(--s1);
-  border: 1px solid var(--border2);
-  border-radius: 18px;
-  padding: 28px 32px;
-  margin-bottom: 16px;
-  animation: fadeDown 0.3s ease both;
-}
-
-.detail.open { display: block; }
-
-.detail-label {
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--text3);
-  margin-bottom: 16px;
-}
-
-.chips { display: flex; flex-wrap: wrap; gap: 9px; }
-
-.chip {
-  font-size: 12.5px;
-  font-weight: 500;
-  padding: 6px 15px;
-  border-radius: 10px;
-  background: var(--s2);
-  border: 1px solid var(--border2);
-  color: var(--text2);
-  transition: border-color 0.2s, color 0.2s, background 0.2s;
-  cursor: default;
-}
-
-.chip:hover { background: var(--s3); border-color: var(--blue); color: var(--text); }
-
-/* ── HINT ── */
-.hint {
-  text-align: center;
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--text3);
-  margin-top: 12px;
-  letter-spacing: 0.05em;
-  animation: fadeUp 0.7s ease 0.6s both;
-}
-
-/* ── ANIMATIONS ── */
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(28px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-@keyframes fadeDown {
-  from { opacity: 0; transform: translateY(-10px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-/* ── NAVBAR ── */
-.navbar {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  padding: 14px 32px;
-  background: rgba(4,7,15,0.85);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(26,62,93,0.4);
-}
-
-.navbar-logo {
-  width: 36px; height: 36px;
-  object-fit: contain;
-  margin-right: 10px;
-  filter: drop-shadow(0 0 8px rgba(0,188,255,0.4));
-}
-
-.navbar-name {
-  font-family: 'Syne', sans-serif;
-  font-size: 18px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  color: #00c8ff;
-  text-shadow: 0 0 16px rgba(0,200,255,0.35);
-  text-transform: uppercase;
-}
-</style>
-</head>
-<body>
-
-
-<nav class="navbar">
-  <img class="navbar-logo" src="data:image/png;base64,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" alt="Nissi Tech Logo">
-  <span class="navbar-name">Nissi Tech</span>
-</nav>
-<canvas id="bg-canvas"></canvas>
-<div class="glow-orb a"></div>
-<div class="glow-orb b"></div>
-<div class="glow-orb c"></div>
-
-<div class="container">
-
-  <header>
-    <div class="brand-pill">
-      <div class="brand-dot"></div>
-      <span class="brand-text">Nissi Tech — Empleados de IA</span>
-    </div>
-    <h1>Tu primer equipo<br><em>que nunca duerme</em></h1>
-    <p class="subtitle">Contrata empleados de IA diseñados para negocios reales. Cada uno asume un rol específico para que puedas dejar de hacer malabarismos y empezar a delegar.</p>
-  </header>
-
-  <div class="grid">
-
-    <!-- GABRIEL -->
-    <div class="card c1" onclick="toggle('d1')">
-      <div class="card-top">
-        <div>
-          <div class="worker-role-title">Especialista en Atención al Cliente</div>
-          <div class="worker-name">Gabriel</div>
-        </div>
-        <div class="icon-box">📩</div>
-      </div>
-      <p class="worker-desc">Tu primer empleado siempre disponible. Gabriel responde, agenda y atiende a cada cliente como si estuvieras tú — sin que estés tú.</p>
-      <div class="section-label">Qué hace</div>
-      <ul class="tasks">
-        <li><span class="dot"></span>Responde mensajes automáticamente — texto, audio e imagen</li>
-        <li><span class="dot"></span>Agenda y confirma citas directamente por chat</li>
-        <li><span class="dot"></span>Envía recordatorios automáticos antes de cada cita</li>
-        <li><span class="dot"></span>Resuelve las preguntas frecuentes del negocio al instante</li>
-      </ul>
-      <div class="tags">
-        <span class="tag">Peluquerías</span>
-        <span class="tag">Spas</span>
-        <span class="tag">Barberías</span>
-        <span class="tag">Odontologías</span>
-        <span class="tag">Ópticas</span>
-      </div>
-      <hr class="divider">
-      <div class="card-footer">
-        <div>
-          <div class="footer-label">Nivel de entrada</div>
-          <div class="footer-sub">ideal para comenzar</div>
-        </div>
-        <span class="tier">Plan Base</span>
-      </div>
-    </div>
-
-    <!-- DAVID -->
-    <div class="card c2" onclick="toggle('d2')">
-      <div class="card-top">
-        <div>
-          <div class="worker-role-title">Gerente de Operaciones</div>
-          <div class="worker-name">David</div>
-        </div>
-        <div class="icon-box">🗂️</div>
-      </div>
-      <p class="worker-desc">El orden que tu negocio necesitaba. David registra, organiza y notifica para que nada se pierda, ningún cliente quede sin respuesta.</p>
-      <div class="section-label">Qué hace</div>
-      <ul class="tasks">
-        <li><span class="dot"></span>Registra cada cliente nuevo y su historial automáticamente</li>
-        <li><span class="dot"></span>Lleva el control de cada caso: quién llegó, qué necesita, cuál es su estado</li>
-        <li><span class="dot"></span>Notifica al cliente en tiempo real: recibido, en proceso, listo para recoger</li>
-        <li><span class="dot"></span>Lee documentos y centraliza la información en tablas organizadas</li>
-      </ul>
-      <div class="tags">
-        <span class="tag">Taller Reparaciones</span>
-        <span class="tag">Ropa</span>
-        <span class="tag">Naturistas</span>
-        <span class="tag">Clínicas</span>
-      </div>
-      <hr class="divider">
-      <div class="card-footer">
-        <div>
-          <div class="footer-label">Nivel operativo</div>
-          <div class="footer-sub">para negocios con volumen</div>
-        </div>
-        <span class="tier">Plan Operativo</span>
-      </div>
-    </div>
-
-    <!-- DANIEL -->
-    <div class="card c3" onclick="toggle('d3')">
-      <div class="card-top">
-        <div>
-          <div class="worker-role-title">Gerente de Marketing & Fidelización</div>
-          <div class="worker-name">Daniel</div>
-        </div>
-        <div class="icon-box">📣</div>
-      </div>
-      <p class="worker-desc">El que mantiene tu negocio en la mente de tus clientes. Daniel construye reputación, envía promos y trae de vuelta a quienes ya te conocen.</p>
-      <div class="section-label">Qué hace</div>
-      <ul class="tasks">
-        <li><span class="dot"></span>Envía mensaje post-servicio solicitando reseña al cliente</li>
-        <li><span class="dot"></span>Distribuye promociones y novedades por WhatsApp</li>
-        <li><span class="dot"></span>Reactiva clientes inactivos con mensajes personalizados</li>
-        <li><span class="dot"></span>Notifica por voz o texto usando llamadas con IA</li>
-      </ul>
-      <div class="tags">
-        <span class="tag">Spas</span>
-        <span class="tag">Barberías</span>
-        <span class="tag">Peluquerías</span>
-        <span class="tag">Ropa</span>
-      </div>
-      <hr class="divider">
-      <div class="card-footer">
-        <div>
-          <div class="footer-label">Nivel fidelización</div>
-          <div class="footer-sub">retención de clientes</div>
-        </div>
-        <span class="tier">Plan Plus</span>
-      </div>
-    </div>
-
-    <!-- SALOMÓN -->
-    <div class="card c4" onclick="toggle('d4')">
-      <div class="shimmer"></div>
-      <div class="premium-pill">★&nbsp;&nbsp;Equipo Completo — Plan Salomón</div>
-      <div class="card-top">
-        <div>
-          <div class="worker-role-title">Director de Operaciones Digitales</div>
-          <div class="worker-name">Salomón</div>
-        </div>
-        <div class="icon-box">👑</div>
-      </div>
-
-      <div class="verse-block">
-        <p class="verse-text">"Más valen dos que uno, porque obtienen más fruto de su esfuerzo. Si caen, el uno levanta al otro." — Eclesiastés 4:9-10</p>
-      </div>
-
-      <p class="worker-desc">Gabriel, David y Daniel trabajando juntos bajo un solo sistema. El equipo completo para el negocio que quiere crecer — sin contratar más personal.</p>
-
-      <div class="sol-body">
-        <div>
-          <div class="section-label">Lo que incluye</div>
-          <ul class="tasks">
-            <li><span class="dot"></span>Atención y agendamiento 24/7 — Gabriel</li>
-            <li><span class="dot"></span>Registro, control y notificaciones — David</li>
-            <li><span class="dot"></span>Reseñas, promos y reactivación — Daniel</li>
-          </ul>
-        </div>
-        <div>
-          <div class="section-label">Exclusivo de Salomón</div>
-          <ul class="tasks">
-            <li><span class="dot"></span>IA que habla, escucha y entiende por llamada telefónica</li>
-            <li><span class="dot"></span>Panel centralizado para el dueño del negocio</li>
-            <li><span class="dot"></span>Onboarding y soporte prioritario Nissi Tech</li>
-          </ul>
-        </div>
-      </div>
-
-      <hr class="divider" style="margin-top:22px;">
-      <div class="card-footer">
-        <div>
-          <div class="footer-label">Tu equipo digital completo</div>
-          <div class="footer-sub">sin sumar personal adicional</div>
-        </div>
-        <span class="tier">Plan Salomón</span>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- PANELS -->
-  <div class="detail" id="d1">
-    <div class="detail-label">🔧 Stack tecnológico — Gabriel</div>
-    <div class="chips">
-      <span class="chip">n8n</span><span class="chip">WhatsApp Business API</span><span class="chip">ManyChat (Instagram)</span><span class="chip">Cal.com / Google Calendar</span><span class="chip">Whisper AI (audios)</span><span class="chip">Claude / GPT-4</span><span class="chip">Twilio (SMS)</span>
-    </div>
-  </div>
-
-  <div class="detail" id="d2">
-    <div class="detail-label">🔧 Stack tecnológico — David</div>
-    <div class="chips">
-      <span class="chip">n8n</span><span class="chip">Google Sheets / Airtable</span><span class="chip">WhatsApp (notificaciones)</span><span class="chip">Telegram Bot</span><span class="chip">PDF / Doc Reader</span><span class="chip">Google Drive</span>
-    </div>
-  </div>
-
-  <div class="detail" id="d3">
-    <div class="detail-label">🔧 Stack tecnológico — Daniel</div>
-    <div class="chips">
-      <span class="chip">n8n</span><span class="chip">WhatsApp API</span><span class="chip">ElevenLabs / Vapi (voz IA)</span><span class="chip">Google Reviews</span><span class="chip">Brevo / Mailchimp</span><span class="chip">Segmentación por etiquetas</span>
-    </div>
-  </div>
-
-  <div class="detail" id="d4">
-    <div class="detail-label">🔧 Stack completo — Salomón</div>
-    <div class="chips">
-      <span class="chip">n8n (núcleo)</span><span class="chip">WhatsApp Business API</span><span class="chip">Cal.com</span><span class="chip">Airtable / Sheets</span><span class="chip">Whisper AI</span><span class="chip">ElevenLabs / Vapi</span><span class="chip">Claude AI</span><span class="chip">Brevo</span><span class="chip">Google Drive</span><span class="chip">Telegram Bot</span><span class="chip">Google Calendar</span><span class="chip">ManyChat</span>
-    </div>
-  </div>
-
-  <p class="hint">↑ Clic en cada worker para ver el stack tecnológico</p>
-
-</div>
-
-<script>
-// ── PARTICLE CANVAS ──
-const canvas = document.getElementById('bg-canvas');
-const ctx = canvas.getContext('2d');
-let W, H, particles = [];
-
-function resize() {
-  W = canvas.width = window.innerWidth;
-  H = canvas.height = window.innerHeight;
-}
-
-function Particle() {
-  this.x = Math.random() * W;
-  this.y = Math.random() * H;
-  this.size = Math.random() * 1.2 + 0.3;
-  this.speedX = (Math.random() - 0.5) * 0.2;
-  this.speedY = (Math.random() - 0.5) * 0.15;
-  const colors = ['rgba(61,142,245,', 'rgba(34,201,138,', 'rgba(232,184,75,'];
-  this.color = colors[Math.floor(Math.random() * colors.length)];
-  this.alpha = Math.random() * 0.4 + 0.1;
-  this.alphaDir = (Math.random() - 0.5) * 0.003;
-}
-
-function init() {
-  resize();
-  particles = [];
-  for (let i = 0; i < 90; i++) particles.push(new Particle());
-}
-
-function draw() {
-  ctx.clearRect(0, 0, W, H);
-  particles.forEach(p => {
-    p.x += p.speedX;
-    p.y += p.speedY;
-    p.alpha += p.alphaDir;
-    if (p.alpha <= 0.05 || p.alpha >= 0.55) p.alphaDir *= -1;
-    if (p.x < 0) p.x = W;
-    if (p.x > W) p.x = 0;
-    if (p.y < 0) p.y = H;
-    if (p.y > H) p.y = 0;
-    ctx.beginPath();
-    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-    ctx.fillStyle = p.color + p.alpha + ')';
-    ctx.fill();
-  });
-  requestAnimationFrame(draw);
-}
-
-init();
-draw();
-window.addEventListener('resize', init);
-
-// ── TOGGLE ──
-function toggle(id) {
-  document.querySelectorAll('.detail').forEach(p => {
-    if (p.id !== id) p.classList.remove('open');
-  });
-  const el = document.getElementById(id);
-  el.classList.toggle('open');
-  if (el.classList.contains('open')) {
-    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  }
-}
-</script>
-</body>
-</html>
+<!DOCTYPE html> 
+
+<html lang="es"> 
+
+<head> 
+
+<meta charset="UTF-8"> 
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+
+<title>Nissi Tech — Trabajadores</title> 
+
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500&display=swap" rel="stylesheet"> 
+
+<style> 
+
+:root{ 
+
+  --bg:#04070f;--s1:#0a1628;--s2:#0e1c32;--s3:#12223c; 
+
+  --border:#1a2e48;--border2:#243d5e; 
+
+  --blue:#3d8ef5;--blue2:#5aa3ff;--blue-glow:rgba(61,142,245,0.18); 
+
+  --green:#22c98a;--green2:#30e09a;--green-glow:rgba(34,201,138,0.15); 
+
+  --gold:#e8b84b;--gold2:#f5d080;--gold-glow:rgba(232,184,75,0.14); 
+
+  --purple:#a78bfa;--purple2:#c4b5fd;--purple-glow:rgba(167,139,250,0.15); 
+
+  --cyan:#00c8ff;--text:#dde8f8;--text2:#7a94b3;--text3:#3d5570; 
+
+} 
+
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box} 
+
+html{scroll-behavior:smooth} 
+
+body{background:var(--bg);color:var(--text);font-family:"DM Sans",sans-serif;min-height:100vh;padding:110px 24px 120px;overflow-x:hidden;position:relative} 
+
+#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.45} 
+
+.orb{position:fixed;border-radius:50%;filter:blur(110px);pointer-events:none;z-index:0} 
+
+.orb.a{width:700px;height:700px;top:-200px;right:-120px;background:radial-gradient(circle,rgba(61,142,245,.09) 0%,transparent 70%)} 
+
+.orb.b{width:600px;height:600px;bottom:60px;left:-140px;background:radial-gradient(circle,rgba(34,201,138,.07) 0%,transparent 70%)} 
+
+.orb.c{width:500px;height:500px;top:50%;left:50%;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(167,139,250,.05) 0%,transparent 70%)} 
+
+ 
+
+/* NAV */ 
+
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;padding:14px 36px;background:rgba(4,7,15,.92);backdrop-filter:blur(24px);border-bottom:1px solid rgba(26,62,93,.4)} 
+
+.nav-logo{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--blue),var(--cyan));display:flex;align-items:center;justify-content:center;font-size:16px;margin-right:12px;flex-shrink:0;box-shadow:0 0 20px rgba(0,200,255,.3)} 
+
+nav > span{font-family:"Syne",sans-serif;font-size:17px;font-weight:800;letter-spacing:.12em;color:var(--cyan);text-shadow:0 0 24px rgba(0,200,255,.4);text-transform:uppercase} 
+
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:20px} 
+
+.nav-status{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)} 
+
+.status-dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 2.5s ease-in-out infinite} 
+
+@keyframes pulse{0%,100%{box-shadow:0 0 6px var(--green),0 0 12px rgba(34,201,138,.3)}50%{box-shadow:0 0 12px var(--green),0 0 28px rgba(34,201,138,.6)}} 
+
+ 
+
+/* WRAP */ 
+
+.wrap{max-width:1080px;margin:0 auto;position:relative;z-index:1} 
+
+ 
+
+/* HEADER */ 
+
+header{text-align:center;margin-bottom:72px;animation:up .8s ease both} 
+
+.pill{display:inline-flex;align-items:center;gap:9px;border:1px solid var(--border2);border-radius:100px;padding:7px 20px;margin-bottom:32px;background:linear-gradient(135deg,var(--s2),var(--s1));box-shadow:0 0 0 1px rgba(61,142,245,.07),inset 0 1px 0 rgba(255,255,255,.04)} 
+
+.dot-live{width:7px;height:7px;background:var(--green);border-radius:50%;box-shadow:0 0 8px var(--green);animation:pulse 2.5s ease-in-out infinite} 
+
+.pill-text{font-family:"Syne",sans-serif;font-size:11px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--text3)} 
+
+h1{font-family:"Syne",sans-serif;font-size:clamp(44px,7vw,82px);font-weight:800;line-height:1;letter-spacing:-.025em;color:var(--text);margin-bottom:20px;animation:up .8s ease .1s both} 
+
+h1 em{font-style:normal;background:linear-gradient(135deg,var(--blue2),var(--green2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text} 
+
+.sub{font-size:15px;color:var(--text2);max-width:520px;margin:0 auto;line-height:1.8;animation:up .8s ease .2s both} 
+
+ 
+
+/* SECTION */ 
+
+.section-title{font-family:"Syne",sans-serif;font-size:10px;font-weight:800;letter-spacing:.25em;text-transform:uppercase;color:var(--text3);display:flex;align-items:center;gap:14px;margin-bottom:18px;margin-top:52px} 
+
+.section-title::before,.section-title::after{content:"";flex:1;height:1px;background:var(--border)} 
+
+ 
+
+/* GRIDS */ 
+
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:18px} 
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px} 
+
+@media(max-width:800px){.grid3,.grid2{grid-template-columns:1fr}} 
+
+@media(min-width:801px) and (max-width:1024px){.grid3{grid-template-columns:repeat(2,1fr)}} 
+
+ 
+
+/* CARD */ 
+
+.card{background:var(--s1);border:1px solid var(--border);border-radius:22px;cursor:pointer;position:relative;overflow:hidden;transition:transform .35s cubic-bezier(.22,.68,0,1.2),box-shadow .35s ease,border-color .35s ease;animation:up .7s ease both} 
+
+.card::before{content:"";position:absolute;top:0;left:15%;right:15%;height:1px;background:linear-gradient(90deg,transparent,var(--ac),transparent);opacity:.25;transition:opacity .35s,left .35s,right .35s;z-index:2} 
+
+.card:hover{transform:translateY(-5px) scale(1.003);border-color:var(--ac);box-shadow:0 0 0 1px var(--ac),0 28px 56px rgba(0,0,0,.65),0 0 40px var(--ac-glow,transparent)} 
+
+.card:hover::before{opacity:1;left:0;right:0} 
+
+.card:hover .ibox{border-color:var(--ac);box-shadow:0 0 16px var(--ac-glow,transparent)} 
+
+.card:hover .tier-badge{background:var(--ac-glow,transparent);box-shadow:0 0 12px var(--ac-glow,transparent)} 
+
+.blue{--ac:var(--blue);--ac-glow:var(--blue-glow)} 
+
+.green{--ac:var(--green);--ac-glow:var(--green-glow)} 
+
+.gold{--ac:var(--gold);--ac-glow:var(--gold-glow);background:linear-gradient(145deg,#0c1a30,#101f3a,#091520);border-color:rgba(232,184,75,.22)} 
+
+.purple{--ac:var(--purple);--ac-glow:var(--purple-glow);background:linear-gradient(145deg,#100d28,#140f30,#0a0820);border-color:rgba(167,139,250,.22)} 
+
+.gold:hover{box-shadow:0 0 0 1px rgba(232,184,75,.5),0 32px 64px rgba(0,0,0,.7),0 0 70px rgba(232,184,75,.1)} 
+
+.purple:hover{box-shadow:0 0 0 1px rgba(167,139,250,.5),0 32px 64px rgba(0,0,0,.7),0 0 70px rgba(167,139,250,.1)} 
+
+.shimmer{position:absolute;inset:0;background:linear-gradient(105deg,transparent 30%,rgba(255,255,255,.025) 50%,transparent 70%);background-size:200% 100%;animation:shim 5s ease-in-out infinite;pointer-events:none;z-index:1} 
+
+@keyframes shim{0%{background-position:-200% 0}100%{background-position:200% 0}} 
+
+ 
+
+/* AVATAR */ 
+
+.avatar-wrap{margin:0;width:100%;height:196px;border-radius:18px 18px 0 0;overflow:hidden;position:relative;flex-shrink:0} 
+
+.avatar-wrap svg{width:100%;height:100%;display:block} 
+
+.avatar-wrap::after{content:'';position:absolute;bottom:0;left:0;right:0;height:55px;background:linear-gradient(transparent,var(--s1));pointer-events:none;z-index:3} 
+
+.gold .avatar-wrap::after{background:linear-gradient(transparent,#0c1a30)} 
+
+.purple .avatar-wrap::after{background:linear-gradient(transparent,#100d28)} 
+
+ 
+
+/* CARD BODY */ 
+
+.card-body{padding:0 24px 22px} 
+
+ 
+
+/* CARD CONTENT */ 
+
+.ctop{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;gap:10px;padding-top:16px} 
+
+.cnum{font-family:"Syne",sans-serif;font-size:9.5px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--text3);margin-bottom:4px} 
+
+.cname{font-family:"Syne",sans-serif;font-size:28px;font-weight:800;line-height:1;letter-spacing:-.02em;color:var(--text)} 
+
+.gold .cname{font-size:32px;background:linear-gradient(135deg,var(--gold2),var(--gold),#c8963a);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text} 
+
+.purple .cname{font-size:32px;background:linear-gradient(135deg,var(--purple2),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text} 
+
+.crole{font-size:11px;color:var(--text3);font-weight:500;margin-top:3px;letter-spacing:.04em} 
+
+.ibox{width:44px;height:44px;border-radius:13px;border:1px solid var(--border2);background:linear-gradient(135deg,var(--s2),var(--s3));display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;transition:border-color .3s,box-shadow .3s} 
+
+.desc{font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:16px} 
+
+.slabel{font-family:"Syne",sans-serif;font-size:9px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--text3);margin-bottom:8px} 
+
+.tasks{list-style:none;display:flex;flex-direction:column;gap:7px;margin-bottom:16px} 
+
+.tasks li{display:flex;align-items:flex-start;gap:9px;font-size:13px;color:var(--text2);line-height:1.45} 
+
+.dot{width:4px;height:4px;min-width:4px;border-radius:50%;background:var(--ac);margin-top:8px;flex-shrink:0;box-shadow:0 0 6px var(--ac-glow,transparent)} 
+
+.channels{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px} 
+
+.ch{font-size:10.5px;font-weight:600;padding:3px 10px;border-radius:20px;border:1px solid var(--border2);color:var(--text3);background:var(--s2)} 
+
+hr.div{border:none;border-top:1px solid var(--border);margin-bottom:14px} 
+
+.gold hr.div,.purple hr.div{border-color:rgba(255,255,255,.07)} 
+
+.footer{display:flex;align-items:center;justify-content:space-between} 
+
+.fl{font-size:11px;font-weight:600;color:var(--text3);margin-bottom:2px} 
+
+.fs{font-size:11px;color:var(--text3);font-weight:300} 
+
+.tier-badge{font-family:"Syne",sans-serif;font-size:10.5px;font-weight:700;padding:5px 14px;border-radius:20px;letter-spacing:.07em;border:1px solid var(--ac);color:var(--ac);background:transparent;text-transform:uppercase;transition:background .2s,box-shadow .2s} 
+
+.premium-pill{display:inline-flex;align-items:center;gap:6px;font-family:"Syne",sans-serif;font-size:9.5px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--ac);background:var(--ac-glow,transparent);border:1px solid var(--ac);opacity:.85;padding:4px 12px;border-radius:20px;margin-bottom:12px} 
+
+.expand-arrow{position:absolute;bottom:20px;right:22px;width:26px;height:26px;border-radius:50%;border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--text3);transition:transform .3s,border-color .3s,color .3s;background:var(--s2);z-index:4} 
+
+.card.active .expand-arrow{transform:rotate(180deg);border-color:var(--ac);color:var(--ac)} 
+
+ 
+
+/* DETAIL PANEL */ 
+
+.detail{display:none;background:rgba(10,22,40,.97);border:1px solid var(--border2);border-radius:16px;padding:24px 28px;margin-bottom:14px;animation:down .3s ease both} 
+
+.detail.open{display:block} 
+
+.dlabel{font-family:"Syne",sans-serif;font-size:9.5px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:var(--text3);margin-bottom:14px} 
+
+.stats-row{display:flex;gap:16px;margin-bottom:18px} 
+
+.stat{flex:1;text-align:center;padding:12px 8px;background:var(--s2);border:1px solid var(--border);border-radius:12px} 
+
+.stat-val{font-family:"Syne",sans-serif;font-size:20px;font-weight:800;color:var(--ac);line-height:1} 
+
+.stat-lbl{font-size:10px;color:var(--text3);margin-top:4px;letter-spacing:.1em;text-transform:uppercase} 
+
+.chips{display:flex;flex-wrap:wrap;gap:8px} 
+
+.chip{font-size:12px;font-weight:500;padding:5px 13px;border-radius:9px;background:var(--s2);border:1px solid var(--border2);color:var(--text2);transition:border-color .2s,color .2s} 
+
+.chip:hover{border-color:var(--blue);color:var(--text)} 
+
+.hint{text-align:center;font-size:12px;color:var(--text3);margin-top:10px;animation:up .7s ease .6s both} 
+
+ 
+
+/* ANIMATIONS */ 
+
+@keyframes up{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}} 
+
+@keyframes down{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}} 
+
+ 
+
+/* SCROLLBAR */ 
+
+::-webkit-scrollbar{width:6px} 
+
+::-webkit-scrollbar-track{background:var(--bg)} 
+
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px} 
+
+::-webkit-scrollbar-thumb:hover{background:var(--blue)} 
+
+ 
+
+/* STAGGER */ 
+
+.card:nth-child(1){animation-delay:.1s} 
+
+.card:nth-child(2){animation-delay:.2s} 
+
+.card:nth-child(3){animation-delay:.3s} 
+
+.card:nth-child(4){animation-delay:.35s} 
+
+.card:nth-child(5){animation-delay:.4s} 
+
+</style> 
+
+</head> 
+
+<body> 
+
+<canvas id="bg-canvas"></canvas> 
+
+<div class="orb a"></div><div class="orb b"></div><div class="orb c"></div> 
+
+ 
+
+<!-- NAV --> 
+
+<nav> 
+
+  <div class="nav-logo">⚡</div> 
+
+  <span>Nissi Tech</span> 
+
+  <div class="nav-right"> 
+
+    <div class="nav-status"><span class="status-dot"></span><span>5 Trabajadores Activos</span></div> 
+
+  </div> 
+
+</nav> 
+
+ 
+
+<div class="wrap"> 
+
+ 
+
+<!-- ENCABEZADO --> 
+
+<header> 
+
+  <div class="pill"><span class="dot-live"></span><span class="pill-text">Fuerza Laboral IA · v2.0</span></div> 
+
+  <h1>Conoce a Nuestros <em>Trabajadores</em></h1> 
+
+  <p class="sub">Cinco agentes de IA especializados, cada uno calibrado con precisión para un dominio distinto. Haz clic en cualquier tarjeta para explorar sus capacidades completas.</p> 
+
+</header> 
+
+ 
+
+<!-- EQUIPO PRINCIPAL --> 
+
+<div class="section-title">Equipo Principal</div> 
+
+<div class="grid3"> 
+
+ 
+
+  <!-- ══════════ SOPHIE ══════════ --> 
+
+  <div class="card blue" onclick="toggleDetail(this)"> 
+
+    <div class="avatar-wrap"> 
+
+      <svg viewBox="0 0 200 196" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"> 
+
+        <defs> 
+
+          <radialGradient id="sp-bg" cx="50%" cy="35%" r="70%"><stop offset="0%" stop-color="#0d2248"/><stop offset="100%" stop-color="#02070e"/></radialGradient> 
+
+          <radialGradient id="sp-face" cx="36%" cy="28%" r="68%"><stop offset="0%" stop-color="#ffd9a0"/><stop offset="50%" stop-color="#dda870"/><stop offset="100%" stop-color="#945530"/></radialGradient> 
+
+          <linearGradient id="sp-rim" x1="0%" y1="50%" x2="100%" y2="50%"><stop offset="0%" stop-color="#00c8ff" stop-opacity="0.32"/><stop offset="28%" stop-color="#00c8ff" stop-opacity="0"/></linearGradient> 
+
+          <radialGradient id="sp-iris" cx="32%" cy="28%" r="62%"><stop offset="0%" stop-color="#9aeeff"/><stop offset="50%" stop-color="#00b8e0"/><stop offset="100%" stop-color="#004868"/></radialGradient> 
+
+          <linearGradient id="sp-hair" x1="50%" y1="0%" x2="50%" y2="100%"><stop offset="0%" stop-color="#1c0840"/><stop offset="100%" stop-color="#0a0320"/></linearGradient> 
+
+          <linearGradient id="sp-body" x1="50%" y1="0%" x2="50%" y2="100%"><stop offset="0%" stop-color="#0a1f42"/><stop offset="100%" stop-color="#040c20"/></linearGradient> 
+
+          <filter id="sp-glow" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="3.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter> 
+
+          <filter id="sp-soft" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="1.8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter> 
+
+        </defs> 
+
+        <!-- BG --> 
+
+        <rect width="200" height="196" fill="url(#sp-bg)"/> 
+
+        <line x1="0" y1="50" x2="200" y2="50" stroke="rgba(0,200,255,0.05)" stroke-width="0.5"/> 
+
+        <line x1="0" y1="130" x2="200" y2="130" stroke="rgba(0,200,255,0.04)" stroke-width="0.5"/> 
+
+        <line x1="40" y1="0" x2="40" y2="196" stroke="rgba(0,200,255,0.04)" stroke-width="0.5"/> 
+
+        <line x1="160" y1="0" x2="160" y2="196" stroke="rgba(0,200,255,0.04)" stroke-width="0.5"/> 
+
+        <!-- BG circuits right --> 
+
+        <path d="M 158 42 L 175 42 L 175 58 L 190 58" stroke="rgba(0,200,255,0.22)" stroke-width="0.9" fill="none"/> 
+
+        <circle cx="190" cy="58" r="2" fill="rgba(0,200,255,0.4)"/> 
+
+        <path d="M 10 88 L 26 88 L 26 72 L 38 72" stroke="rgba(0,200,255,0.15)" stroke-width="0.8" fill="none"/> 
+
+        <circle cx="38" cy="72" r="1.5" fill="rgba(0,200,255,0.3)"/> 
+
+        <!-- Aura glow --> 
+
+        <ellipse cx="100" cy="120" rx="62" ry="72" fill="rgba(0,80,180,0.1)"/> 
+
+        <!-- Body --> 
+
+        <path d="M 0 196 L 0 170 Q 30 158 58 152 Q 78 148 100 146 Q 122 148 142 152 Q 170 158 200 170 L 200 196 Z" fill="url(#sp-body)"/> 
+
+        <path d="M 72 152 Q 100 144 128 152 L 122 144 Q 100 138 78 144 Z" fill="#0a1f42" stroke="rgba(0,200,255,0.55)" stroke-width="0.9"/> 
+
+        <path d="M 72 152 Q 100 144 128 152" stroke="#00c8ff" stroke-width="1.2" fill="none" stroke-opacity="0.7" filter="url(#sp-soft)"/> 
+
+        <!-- Neck --> 
+
+        <rect x="88" y="133" width="24" height="18" rx="5" fill="#d4a070"/> 
+
+        <rect x="88" y="133" width="24" height="7" rx="3" fill="rgba(0,0,0,0.14)"/> 
+
+        <!-- Ears --> 
+
+        <ellipse cx="51" cy="105" rx="7" ry="9" fill="#d4a070"/><ellipse cx="51" cy="105" rx="4" ry="6" fill="#ba8858"/> 
+
+        <ellipse cx="149" cy="105" rx="7" ry="9" fill="#d4a070"/><ellipse cx="149" cy="105" rx="4" ry="6" fill="#ba8858"/> 
+
+        <!-- Face --> 
+
+        <ellipse cx="100" cy="100" rx="52" ry="56" fill="url(#sp-face)"/> 
+
+        <ellipse cx="100" cy="100" rx="52" ry="56" fill="url(#sp-rim)"/> 
+
+        <ellipse cx="84" cy="83" rx="22" ry="11" fill="rgba(255,255,255,0.09)"/> 
+
+        <ellipse cx="100" cy="134" rx="40" ry="16" fill="rgba(0,0,0,0.12)"/> 
+
+        <!-- Hair back --> 
+
+        <path d="M 50 88 Q 54 50 100 44 Q 146 50 150 88 Q 148 68 144 52 Q 130 16 100 14 Q 70 16 56 52 Q 52 68 50 88 Z" fill="url(#sp-hair)"/> 
+
+        <path d="M 50 88 Q 44 110 46 134 Q 48 146 55 150" stroke="#0e0425" stroke-width="15" fill="none" stroke-linecap="round"/> 
+
+        <path d="M 150 88 Q 156 110 154 134 Q 152 146 145 150" stroke="#0e0425" stroke-width="15" fill="none" stroke-linecap="round"/> 
+
+        <!-- Eye sockets --> 
+
+        <ellipse cx="82" cy="96" rx="15" ry="8.5" fill="rgba(50,15,5,0.2)"/> 
+
+        <ellipse cx="118" cy="96" rx="15" ry="8.5" fill="rgba(50,15,5,0.2)"/> 
+
+        <!-- L eye --> 
+
+        <ellipse cx="82" cy="96" rx="13" ry="7.5" fill="#f0ece8"/> 
+
+        <ellipse cx="78" cy="96" rx="4" ry="7.5" fill="rgba(170,150,130,0.28)"/> 
+
+        <ellipse cx="82" cy="96" rx="8" ry="7" fill="url(#sp-iris)"/> 
+
+        <ellipse cx="82" cy="96" rx="3.8" ry="3.8" fill="#00090e"/> 
+
+        <ellipse cx="84.5" cy="93.5" rx="2" ry="1.5" fill="rgba(255,255,255,0.9)"/> 
+
+        <ellipse cx="82" cy="96" rx="8.5" ry="7.5" fill="none" stroke="rgba(0,200,255,0.55)" stroke-width="0.9" filter="url(#sp-soft)"/> 
+
+        <path d="M 69 91.5 Q 82 87 95 91.5" stroke="#300e04" stroke-width="1.6" fill="none" stroke-linecap="round"/> 
+
+        <path d="M 70 91 L 67 88 M 76 89 L 74.5 86 M 82 88 L 82 85 M 88 89 L 90.5 86 M 94 91 L 97 88" stroke="#200a02" stroke-width="1.1" fill="none" stroke-linecap="round"/> 
+
+        <!-- R eye --> 
+
+        <ellipse cx="118" cy="96" rx="13" ry="7.5" fill="#f0ece8"/> 
+
+        <ellipse cx="122" cy="96" rx="4" ry="7.5" fill="rgba(170,150,130,0.22)"/> 
+
+        <ellipse cx="118" cy="96" rx="8" ry="7" fill="url(#sp-iris)"/> 
+
+        <ellipse cx="118" cy="96" rx="3.8" ry="3.8" fill="#00090e"/> 
+
+        <ellipse cx="120.5" cy="93.5" rx="2" ry="1.5" fill="rgba(255,255,255,0.9)"/> 
+
+        <ellipse cx="118" cy="96" rx="8.5" ry="7.5" fill="none" stroke="rgba(0,200,255,0.55)" stroke-width="0.9" filter="url(#sp-soft)"/> 
+
+        <path d="M 105 91.5 Q 118 87 131 91.5" stroke="#300e04" stroke-width="1.6" fill="none" stroke-linecap="round"/> 
+
+        <path d="M 106 91 L 103 88 M 112 89 L 110.5 86 M 118 88 L 118 85 M 124 89 L 126.5 86 M 130 91 L 133 88" stroke="#200a02" stroke-width="1.1" fill="none" stroke-linecap="round"/> 
+
+        <!-- Eyebrows --> 
+
+        <path d="M 68 85 Q 82 80 95 84" stroke="#280c04" stroke-width="2.6" fill="none" stroke-linecap="round"/> 
+
+        <path d="M 105 84 Q 118 80 132 85" stroke="#280c04" stroke-width="2.6" fill="none" stroke-linecap="round"/> 
+
+        <!-- Nose --> 
+
+        <path d="M 100 103 L 100 113" stroke="rgba(160,88,32,0.24)" stroke-width="2" fill="none" stroke-linecap="round"/> 
+
+        <path d="M 93 115 Q 91 117 93 118 Q 96.5 119 100 118" fill="none" stroke="rgba(110,55,18,0.35)" stroke-width="1.2"/> 
+
+        <path d="M 107 115 Q 109 117 107 118 Q 103.5 119 100 118" fill="none" stroke="rgba(110,55,18,0.35)" stroke-width="1.2"/> 
+
+        <ellipse cx="100" cy="115" rx="3" ry="1.4" fill="rgba(255,210,165,0.4)"/> 
+
+        <!-- Lips --> 
+
+        <path d="M 88 126 Q 94 123 100 124 Q 106 123 112 126 Q 106 122 100 121 Q 94 122 88 126" fill="#cc6860"/> 
+
+        <path d="M 88 126 Q 94 132 100 133 Q 106 132 112 126" fill="#de7870"/> 
+
+        <path d="M 88 126 Q 100 124 112 126" stroke="#aa5848" stroke-width="0.8" fill="none"/> 
+
+        <ellipse cx="100" cy="130" rx="5" ry="2" fill="rgba(255,195,185,0.42)"/> 
+
+        <!-- Cheeks --> 
+
+        <ellipse cx="68" cy="110" rx="12" ry="7" fill="rgba(218,88,65,0.11)"/> 
+
+        <ellipse cx="132" cy="110" rx="12" ry="7" fill="rgba(218,88,65,0.11)"/> 
+
+        <ellipse cx="73" cy="102" rx="9" ry="5" fill="rgba(255,232,205,0.18)"/> 
+
+        <ellipse cx="127" cy="102" rx="9" ry="5" fill="rgba(255,232,205,0.16)"/> 
+
+        <!-- Hair front --> 
+
+        <path d="M 52 85 Q 56 100 58 118 Q 60 132 61 140" stroke="#0e0425" stroke-width="17" fill="none" stroke-linecap="round"/> 
+
+        <path d="M 148 85 Q 144 100 142 118 Q 140 132 139 140" stroke="#0e0425" stroke-width="17" fill="none" stroke-linecap="round"/> 
+
+        <path d="M 52 82 Q 58 42 100 36 Q 142 42 148 82 Q 126 56 100 52 Q 74 56 52 82 Z" fill="#160530"/> 
+
+        <path d="M 76 50 Q 100 44 124 50" stroke="rgba(0,200,255,0.45)" stroke-width="1.4" fill="none" filter="url(#sp-soft)" stroke-linecap="round"/> 
+
+        <!-- Cyan hair tips --> 
+
+        <path d="M 59 130 Q 60 140 62 148" stroke="#00c8ff" stroke-width="2.8" fill="none" filter="url(#sp-glow)" stroke-linecap="round" opacity="0.85"/> 
+
+        <path d="M 141 130 Q 140 140 138 148" stroke="#00c8ff" stroke-width="2.8" fill="none" filter="url(#sp-glow)" stroke-linecap="round" opacity="0.85"/> 
+
+        <path d="M 62 72 Q 72 56 90 50" stroke="rgba(0,200,255,0.38)" stroke-width="1.2" fill="none" filter="url(#sp-soft)" stroke-linecap="round"/> 
+
+        <!-- Circuit cheek --> 
+
+        <path d="M 140 98 L 152 98 L 152 110 L 162 110" stroke="rgba(0,200,255,0.45)" stroke-width="0.9" fill="none"/> 
+
+        <circle cx="162" cy="110" r="1.8" fill="rgba(0,200,255,0.65)" filter="url(#sp-soft)"/> 
+
+        <circle cx="152" cy="98" r="1.2" fill="rgba(0,200,255,0.5)"/> 
+
+        <!-- Earring --> 
+
+        <circle cx="44" cy="108" r="4" fill="rgba(0,200,255,0.7)" filter="url(#sp-glow)"/> 
+
+        <circle cx="44" cy="108" r="2" fill="rgba(160,235,255,0.9)"/> 
+
+        <!-- HUD lines --> 
+
+        <rect x="60" y="91" width="34" height="1" fill="rgba(0,200,255,0.22)" rx="0.5"/> 
+
+        <rect x="106" y="91" width="34" height="1" fill="rgba(0,200,255,0.22)" rx="0.5"/> 
+
+        <!-- Holographic palette --> 
+
+        <g filter="url(#sp-soft)"> 
+
+          <circle cx="172" cy="58" r="14" fill="rgba(0,12,40,0.55)" stroke="rgba(0,200,255,0.45)" stroke-width="1"/> 
+
+          <circle cx="168" cy="54" r="4.5" fill="rgba(255,75,75,0.75)"/> 
+
+          <circle cx="176" cy="54" r="4.5" fill="rgba(75,210,255,0.75)"/> 
+
+          <circle cx="172" cy="62" r="4.5" fill="rgba(255,222,45,0.75)"/> 
+
+          <animateTransform attributeName="transform" type="rotate" values="0 172 58;12 172 58;0 172 58" dur="5s" repeatCount="indefinite"/> 
+
+        </g> 
+
+        <!-- Particles --> 
+
+        <circle cx="22" cy="28" r="1.2" fill="rgba(0,200,255,0.6)"><animate attributeName="opacity" values="0.2;0.9;0.2" dur="2.3s" repeatCount="indefinite"/></circle> 
+
+        <circle cx="178" cy="40" r="1.5" fill="rgba(0,200,255,0.5)"><animate attributeName="opacity" values="0.7;0.1;0.7" dur="3.1s" repeatCount="indefinite"/></circle> 
+
+        <circle cx="14" cy="155" r="1" fill="rgba(0,200,255,0.4)"><animate attributeName="opacity" values="0.3;0.8;0.3" dur="1.8s" repeatCount="indefinite"/></circle> 
+
+        <circle cx="186" cy="168" r="1.2" fill="rgba(0,200,255,0.4)"><animate attributeName="opacity" values="0.5;0.1;0.5" dur="2.7s" repeatCount="indefinite"/></circle> 
+
+        <!-- Scan line --> 
+
+        <rect x="0" y="0" width="200" height="1.5" fill="rgba(0,200,255,0.14)" rx="0.5" opacity="0"><animate attributeName="y" values="0;196" dur="4s" repeatCount="indefinite"/><animate attributeName="opacity" values="0;0.9;0.9;0" keyTimes="0;0.04;0.96;1" dur="4s" repeatCount="indefinite"/></rect> 
+
+        <!-- Badge --> 
+
+        <rect x="8" y="177" width="88" height="14" rx="3.5" fill="rgba(0,18,58,0.78)" stroke="rgba(0,200,255,0.38)" stroke-width="0.8"/> 
+
+        <text x="52" y="187.5" text-anchor="middle" font-family="'Courier New',monospace" font-size="7" fill="rgba(0,200,255,0.88)" font-weight="700" letter-spacing="1.8">AGENTE · #01</text> 
+
+      </svg> 
+
+    </div> 
+
+    <div class="card-body"> 
+
+      <div class="ctop"> 
+
+        <div><div class="cnum">Trabajador #01</div><div class="cname">Sophie</div><div class="crole">IA de Diseño & Creatividad</div></div> 
+
+        <div class="ibox">🎨</div> 
+
+      </div> 
+
+      <p class="desc">Sophie transforma ideas en experiencias visualmente impactantes. Desde identidades de marca hasta sistemas de diseño UI, aporta claridad creativa a cada proyecto.</p> 
+
+      <div class="slabel">Especialidades</div> 
+
+      <ul class="tasks"> 
+
+        <li><span class="dot"></span>Identidad de marca y sistemas de diseño visual</li> 
+
+        <li><span class="dot"></span>Prototipado y wireframing UI/UX</li> 
+
+        <li><span class="dot"></span>Activos de marketing y contenido para redes</li> 
+
+      </ul> 
+
+      <div class="channels"><span class="ch">Figma</span><span class="ch">Adobe Suite</span><span class="ch">Canva Pro</span><span class="ch">Midjourney</span></div> 
+
+      <hr class="div"> 
+
+      <div class="footer"><div><div class="fl">Entrega Prom.</div><div class="fs">~4 horas</div></div><span class="tier-badge">Creativo</span></div> 
+
+    </div> 
+
+    <span class="expand-arrow">▾</span> 
+
+  </div> 
+
+ 
+
+  <!-- ══════════ RILEY ══════════ --> 
+
+  <div class="card green" onclick="toggleDetail(this)"> 
+
+    <div class="avatar-wrap"> 
+
+      <svg viewBox="0 0 200 196" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"> 
+
+        <defs> 
+
+          <radialGradient id="ri-bg" cx="50%" cy="35%" r="70%"><stop offset="0%" stop-color="#0a2015"/><stop offset="100%" stop-color="#01070a"/></radialGradient> 
+
+          <radialGradient id="ri-face" cx="38%" cy="28%" r="68%"><stop offset="0%" stop-color="#eedbc0"/><stop offset="50%" stop-color="#cca480"/><stop offset="100%" stop-color="#906040"/></radialGradient> 
+
+          <linearGradient id="ri-rim" x1="0%" y1="50%" x2="100%" y2="50%"><stop offset="0%" stop-color="#22c98a" stop-opacity="0.35"/><stop offset="28%" stop-color="#22c98a" stop-opacity="0"/></linearGradient> 
+
+          <radialGradient id="ri-iris" cx="30%" cy="28%" r="60%"><stop offset="0%" stop-color="#90ffca"/><stop offset="48%" stop-color="#22c98a"/><stop offset="100%" stop-color="#044828"/></radialGradient> 
+
+          <linearGradient id="ri-hair" x1="50%" y1="0%" x2="50%" y2="100%"><stop offset="0%" stop-color="#0e1208"/><stop offset="100%" stop-color="#060804"/></linearGradient> 
+
+          <linearGradient id="ri-body" x1="50%" y1="0%" x2="50%" y2="100%"><stop offset="0%" stop-color="#0a2018"/><stop offset="100%" stop-color="#040c08"/></linearGradient> 
+
+          <filter id="ri-glow" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="3.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter> 
+
+          <filter id="ri-soft" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="1.8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter> 
+
+        </defs> 
+
+        <rect width="200" height="196" fill="url(#ri-bg)"/> 
+
+        <!-- BG matrix dots --> 
+
+        <g fill="rgba(34,201,138,0.12)" font-family="monospace" font-size="6"> 
+
+          <text x="10" y="20">01001</text><text x="155" y="35">10110</text> 
+
+          <text x="8" y="165">11001</text><text x="150" y="178">01011</text> 
+
+          <text x="80" y="12">1010</text> 
+
+        </g> 
+
+        <line x1="0" y1="55" x2="200" y2="55" stroke="rgba(34,201,138,0.06)" stroke-width="0.5"/> 
+
+        <line x1="0" y1="138" x2="200" y2="138" stroke="rgba(34,201,138,0.05)" stroke-width="0.5"/> 
+
+        <!-- Circuits --> 
+
+        <path d="M 160 40 L 178 40 L 178 55 L 192 55" stroke="rgba(34,201,138,0.28)" stroke-width="0.9" fill="none"/> 
+
+        <circle cx="192" cy="55" r="2" fill="rgba(34,201,138,0.5)"/> 
+
+        <path d="M 8 92 L 22 92 L 22 78 L 36 78" stroke="rgba(34,201,138,0.2)" stroke-width="0.8" fill="none"/> 
+
+        <circle cx="36" cy="78" r="1.5" fill="rgba(34,201,138,0.4)"/> 
+
+        <ellipse cx="100" cy="118" rx="62" ry="70" fill="rgba(0,80,40,0.1)"/> 
+
+        <!-- Body + collar --> 
+
+        <path d="M 0 196 L 0 170 Q 30 158 58 152 Q 78 148 100 146 Q 122 148 142 152 Q 170 158 200 170 L 200 196 Z" fill="url(#ri-body)"/> 
+
+        <path d="M 72 152 Q 100 144 128 152 L 122 144 Q 100 138 78 144 Z" fill="#0a2018" stroke="rgba(34,201,138,0.6)" stroke-width="0.9"/> 
+
+        <path d="M 72 152 Q 100 144 128 152" stroke="#22c98a" stroke-width="1.2" fill="none" stroke-opacity="0.7" filter="url(#ri-soft)"/> 
+
+        <!-- Neck --> 
+
+        <rect x="88" y="133" width="24" height="18" rx="5" fill="#cca480"/> 
+
+        <rect x="88" y="133" width="24" height="7" rx="3" fill="rgba(0,0,0,0.13)"/> 
+
+        <!-- Ears --> 
+
+        <ellipse cx="51" cy="105" rx="7" ry="9" fill="#cca480"/><ellipse cx="51" cy="105" rx="4" ry="6" fill="#b08858"/> 
+
+        <ellipse cx="149" cy="105" rx="7" ry="9" fill="#cca480"/><ellipse cx="149" cy="105" rx="4" ry="6" fill="#b08858"/> 
+
+        <!-- Face --> 
+
+        <ellipse cx="100" cy="100" rx="52" ry="56" fill="url(#ri-face)"/> 
+
+        <ellipse cx="100" cy="100" rx="52" ry="56" fill="url(#ri-rim)"/> 
+
+        <ellipse cx="84" cy="83" rx="22" ry="11" fill="rgba(255,255,255,0.08)"/> 
+
+        <ellipse cx="100" cy="134" rx="40" ry="16" fill="rgba(0,0,0,0.11)"/> 
+
+        <!-- Short hair back --> 
+
+        <path d="M 54 92 Q 58 55 100 50 Q 142 55 146 92 Q 144 74 140 60 Q 126 28 100 26 Q 74 28 60 60 Q 56 74 54 92 Z" fill="url(#ri-hair)"/> 
+
+        <!-- Short hair - doesn't extend past ears --> 
+
+        <path d="M 54 88 Q 52 105 55 118 Q 57 126 62 128" stroke="#060804" stroke-width="10" fill="none" stroke-linecap="round"/> 
+
+        <path d="M 146 88 Q 148 105 145 118 Q 143 126 138 128" stroke="#060804" stroke-width="10" fill="none" stroke-linecap="round"/> 
+
+        <!-- Eye sockets --> 
+
+        <ellipse cx="82" cy="96" rx="15" ry="8.5" fill="rgba(40,12,4,0.18)"/> 
+
+        <ellipse cx="118" cy="96" rx="15" ry="8.5" fill="rgba(40,12,4,0.18)"/> 
+
+        <!-- DATA GLASSES frame --> 
+
+        <rect x="63" y="88" width="32" height="18" rx="6" fill="rgba(34,201,138,0.08)" stroke="rgba(34,201,138,0.55)" stroke-width="1.2"/> 
+
+        <rect x="105" y="88" width="32" height="18" rx="6" fill="rgba(34,201,138,0.08)" stroke="rgba(34,201,138,0.55)" stroke-width="1.2"/> 
+
+        <line x1="95" y1="97" x2="105" y2="97" stroke="rgba(34,201,138,0.55)" stroke-width="1.2"/> 
+
+        <line x1="52" y1="97" x2="63" y2="97" stroke="rgba(34,201,138,0.45)" stroke-width="1.2"/> 
+
+        <line x1="137" y1="97" x2="148" y2="97" stroke="rgba(34,201,138,0.45)" stroke-width="1.2"/> 
+
+        <!-- L eye (behind glasses) --> 
+
+        <ellipse cx="79" cy="97" rx="11" ry="6.5" fill="#ece8e4"/> 
+
+        <ellipse cx="79" cy="97" rx="7" ry="6" fill="url(#ri-iris)"/> 
+
+        <ellipse cx="79" cy="97" rx="3.5" ry="3.5" fill="#000a04"/> 
+
+        <ellipse cx="81" cy="94.5" rx="1.8" ry="1.4" fill="rgba(255,255,255,0.88)"/> 
+
+        <ellipse cx="79" cy="97" rx="7.5" ry="6.5" fill="none" stroke="rgba(34,201,138,0.6)" stroke-width="0.9" filter="url(#ri-soft)"/> 
+
+        <!-- R eye --> 
+
+        <ellipse cx="121" cy="97" rx="11" ry="6.5" fill="#ece8e4"/> 
+
+        <ellipse cx="121" cy="97" rx="7" ry="6" fill="url(#ri-iris)"/> 
+
+        <ellipse cx="121" cy="97" rx="3.5" ry="3.5" fill="#000a04"/> 
+
+        <ellipse cx="123" cy="94.5" rx="1.8" ry="1.4" fill="rgba(255,255,255,0.88)"/> 
+
+        <ellipse cx="121" cy="97" rx="7.5" ry="6.5" fill="none" stroke="rgba(34,201,138,0.6)" stroke-width="0.9" filter="url(#ri-soft)"/> 
+
+        <!-- Eyebrows (visible above glasses) --> 
+
+        <path d="M 66 84 Q 79 80 92 84" stroke="#200c04" stroke-width="2.4" fill="none" stroke-linecap="round"/> 
+
+        <path d="M 108 84 Q 121 80 134 84" stroke="#200c04" stroke-width="2.4" fill="none" stroke-linecap="round"/> 
+
+        <!-- Nose --> 
+
+        <path d="M 100 104 L 100 113" stroke="rgba(140,78,28,0.22)" stroke-width="1.8" fill="none" stroke-linecap="round"/> 
+
+        <path d="M 94 114 Q 92 116 94 117 Q 97 118 100 117" fill="none" stroke="rgba(100,50,15,0.33)" stroke-width="1.1"/> 
+
+        <path d="M 106 114 Q 108 116 106 117 Q 103 118 100 117" fill="none" stroke="rgba(100,50,15,0.33)" stroke-width="1.1"/> 
+
+        <!-- Lips --> 
+
+        <path d="M 89 126 Q 95 123 100 124 Q 105 123 111 126 Q 105 121 100 120 Q 95 121 89 126" fill="#b85850"/> 
+
+        <path d="M 89 126 Q 95 132 100 133 Q 105 132 111 126" fill="#cc6860"/> 
+
+        <path d="M 89 126 Q 100 124 111 126" stroke="#9a4840" stroke-width="0.8" fill="none"/> 
+
+        <ellipse cx="100" cy="130" rx="4.5" ry="1.8" fill="rgba(255,190,180,0.4)"/> 
+
+        <!-- Cheeks --> 
+
+        <ellipse cx="68" cy="110" rx="11" ry="6.5" fill="rgba(200,80,55,0.1)"/> 
+
+        <ellipse cx="132" cy="110" rx="11" ry="6.5" fill="rgba(200,80,55,0.1)"/> 
+
+        <ellipse cx="73" cy="102" rx="8" ry="5" fill="rgba(255,228,200,0.16)"/> 
+
+        <ellipse cx="127" cy="102" rx="8" ry="5" fill="rgba(255,228,200,0.14)"/> 
+
+        <!-- Hair top (short, tidy) --> 
+
+        <path d="M 54 88 Q 60 45 100 40 Q 140 45 146 88 Q 124 60 100 56 Q 76 60 54 88 Z" fill="#0a0e06"/> 
+
+        <path d="M 78 54 Q 100 48 122 54" stroke="rgba(34,201,138,0.4)" stroke-width="1.3" fill="none" filter="url(#ri-soft)" stroke-linecap="round"/> 
+
+        <!-- Green data streams in hair --> 
+
+        <path d="M 66 62 Q 70 52 82 48" stroke="rgba(34,201,138,0.55)" stroke-width="1.2" fill="none" filter="url(#ri-soft)" stroke-linecap="round"/> 
+
+        <path d="M 134 62 Q 130 52 118 48" stroke="rgba(34,201,138,0.45)" stroke-width="1.2" fill="none" filter="url(#ri-soft)" stroke-linecap="round"/> 
+
+        <!-- Circuit lines cheeks --> 
+
+        <path d="M 140 102 L 152 102 L 152 114 L 164 114" stroke="rgba(34,201,138,0.42)" stroke-width="0.9" fill="none"/> 
+
+        <circle cx="164" cy="114" r="1.8" fill="rgba(34,201,138,0.65)" filter="url(#ri-soft)"/> 
+
+        <path d="M 60 102 L 48 102 L 48 114 L 36 114" stroke="rgba(34,201,138,0.35)" stroke-width="0.9" fill="none"/> 
+
+        <circle cx="36" cy="114" r="1.5" fill="rgba(34,201,138,0.5)"/> 
+
+        <!-- Ear studs --> 
+
+        <circle cx="44" cy="108" r="3.5" fill="rgba(34,201,138,0.7)" filter="url(#ri-glow)"/> 
+
+        <circle cx="44" cy="108" r="1.8" fill="rgba(180,255,220,0.9)"/> 
+
+        <!-- HUD data in glasses lenses --> 
+
+        <text x="67" y="100" font-family="monospace" font-size="4.5" fill="rgba(34,201,138,0.6)">101</text> 
+
+        <text x="109" y="100" font-family="monospace" font-size="4.5" fill="rgba(34,201,138,0.6)">010</text> 
+
+        <!-- Floating data chart hologram --> 
+
+        <g transform="translate(168,62)" filter="url(#ri-soft)"> 
+
+          <rect width="24" height="16" rx="2" fill="rgba(0,10,6,0.6)" stroke="rgba(34,201,138,0.45)" stroke-width="0.8"/> 
+
+          <rect x="3" y="8" width="3" height="6" fill="rgba(34,201,138,0.7)"/> 
+
+          <rect x="8" y="5" width="3" height="9" fill="rgba(34,201,138,0.8)"/> 
+
+          <rect x="13" y="10" width="3" height="4" fill="rgba(34,201,138,0.6)"/> 
+
+          <rect x="18" y="7" width="3" height="7" fill="rgba(34,201,138,0.75)"/> 
+
+          <animate attributeName="opacity" values="0.7;1;0.7" dur="2.5s" repeatCount="indefinite"/> 
+
+        </g> 
+
+        <!-- Particles --> 
+
+        <circle cx="18" cy="30" r="1.2" fill="rgba(34,201,138,0.6)"><animate attributeName="opacity" values="0.2;0.9;0.2" dur="2.1s" repeatCount="indefinite"/></circle> 
+
+        <circle cx="182" cy="42" r="1.4" fill="rgba(34,201,138,0.5)"><animate attributeName="opacity" values="0.7;0.1;0.7" dur="3.4s" repeatCount="indefinite"/></circle> 
+
+        <circle cx="12" cy="158" r="1" fill="rgba(34,201,138,0.4)"><animate attributeName="opacity" values="0.3;0.8;0.3" dur="1.9s" repeatCount="indefinite"/></circle> 
+
+        <circle cx="188" cy="170" r="1.2" fill="rgba(34,201,138,0.4)"><animate attributeName="opacity" values="0.5;0.1;0.5" dur="2.8s" repeatCount="indefinite"/></circle> 
+
+        <rect x="0" y="0" width="200" height="1.5" fill="rgba(34,201,138,0.14)" rx="0.5" opacity="0"><animate attributeName="y" values="0;196" dur="3.8s" repeatCount="indefinite"/><animate attributeName="opacity" values="0;0.9;0.9;0" keyTimes="0;0.04;0.96;1" dur="3.8s" repeatCount="indefinite"/></rect> 
+
+        <!-- Badge --> 
+
+        <rect x="8" y="177" width="88" height="14" rx="3.5" fill="rgba(0,20,10,0.78)" stroke="rgba(34,201,138,0.38)" stroke-width="0.8"/> 
+
+        <text x="52" y="187.5" text-anchor="middle" font-family="'Courier New',monospace" font-size="7" fill="rgba(34,201,138,0.88)" font-weight="700" letter-spacing="1.8">AGENTE · #02</text> 
+
+      </svg> 
+
+    </div> 
+
+    <div class="card-body"> 
+
+      <div class="ctop"> 
+
+        <div><div class="cnum">Trabajador #02</div><div class="cname">Riley</div><div class="crole">IA de Datos & Analítica</div></div> 
+
+        <div class="ibox">📊</div> 
+
+      </div> 
+
+      <p class="desc">Riley convierte datos brutos en inteligencia accionable. Desde dashboards en tiempo real hasta modelos predictivos, hace que los números tengan sentido.</p> 
+
+      <div class="slabel">Especialidades</div> 
+
+      <ul class="tasks"> 
+
+        <li><span class="dot"></span>Dashboards en tiempo real y seguimiento de KPIs</li> 
+
+        <li><span class="dot"></span>Modelos predictivos y análisis de tendencias</li> 
+
+        <li><span class="dot"></span>Pipelines de reportes automatizados</li> 
+
+      </ul> 
+
+      <div class="channels"><span class="ch">Python</span><span class="ch">SQL</span><span class="ch">Tableau</span><span class="ch">BigQuery</span></div> 
+
+      <hr class="div"> 
+
+      <div class="footer"><div><div class="fl">Entrega Prom.</div><div class="fs">~1 hora</div></div><span class="tier-badge">Analítica</span></div> 
+
+    </div> 
+
+    <span class="expand-arrow">▾</span> 
+
+  </div> 
+
+ 
+
+  <!-- ══════════ NOAH ══════════ --> 
+
+  <div class="card blue" onclick="toggleDetail(this)"> 
+
+    <div class="avatar-wrap"> 
+
+      <svg viewBox="0 0 200 196" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"> 
+
+        <defs> 
+
+          <radialGradient id="no-bg" cx="50%" cy="35%" r="70%"><stop offset="0%" stop-color="#080e2a"/><stop offset="100%" stop-color="#02040e"/></radialGradient> 
+
+          <radialGradient id="no-face" cx="36%" cy="28%" r="68%"><stop offset="0%" stop-color="#e2b87c"/><stop offset="50%" stop-color="#c09055"/><stop offset="100%" stop-color="#7a4820"/></radialGradient> 
+
+          <linearGradient id="no-rim" x1="0%" y1="50%" x2="100%" y2="50%"><stop offset="0%" stop-color="#3d8ef5" stop-opacity="0.35"/><stop offset="28%" stop-color="#3d8ef5" stop-opacity="0"/></linearGradient> 
+
+          <radialGradient id="no-iris" cx="30%" cy="28%" r="60%"><stop offset="0%" stop-color="#a8d8ff"/><stop offset="48%" stop-color="#3d8ef5"/><stop offset="100%" stop-color="#001850"/></radialGradient> 
+
+          <linearGradient id="no-hair" x1="50%" y1="0%" x2="50%" y2="100%"><stop offset="0%" stop-color="#101018"/><stop offset="100%" stop-color="#06060c"/></linearGradient> 
+
+          <linearGradient id="no-hood" x1="50%" y1="0%" x2="50%" y2="100%"><stop offset="0%" stop-color="#0c1228"/><stop offset="100%" stop-color="#060810"/></linearGradient> 
+
+          <filter id="no-glow" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="3.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter> 
+
+          <filter id="no-soft" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="1.8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter> 
+
+        </defs> 
+
+        <rect width="200" height="196" fill="url(#no-bg)"/> 
+
+        <line x1="0" y1="50" x2="200" y2="50" stroke="rgba(61,142,245,0.05)" stroke-width="0.5"/> 
+
+        <line x1="0" y1="138" x2="200" y2="138" stroke="rgba(61,142,245,0.04)" stroke-width="0.5"/> 
+
+        <line x1="40" y1="0" x2="40" y2="196" stroke="rgba(61,142,245,0.04)" stroke-width="0.5"/> 
+
+        <line x1="160" y1="0" x2="160" y2="196" stroke="rgba(61,142,245,0.04)" stroke-width="0.5"/> 
+
+        <path d="M 158 42 L 176 42 L 176 58 L 190 58" stroke="rgba(61,142,245,0.25)" stroke-width="0.9" fill="none"/> 
+
+        <circle cx="190" cy="58" r="2" fill="rgba(61,142,245,0.45)"/> 
+
+        <ellipse cx="100" cy="118" rx="62" ry="70" fill="rgba(20,50,150,0.1)"/> 
+
+        <!-- Hoodie body --> 
+
+        <path d="M 0 196 L 0 165 Q 30 148 60 142 Q 78 138 100 136 Q 122 138 140 142 Q 170 148 200 165 L 200 196 Z" fill="url(#no-hood)"/> 
+
+        <!-- Hoodie neckline --> 
+
+        <path d="M 68 142 Q 100 134 132 142 L 125 132 Q 100 125 75 132 Z" fill="#0c1228" stroke="rgba(61,142,245,0.5)" stroke-width="0.9"/> 
+
+        <path d="M 68 142 Q 100 134 132 142" stroke="#5aa3ff" stroke-width="1.2" fill="none" stroke-opacity="0.6" filter="url(#no-soft)"/> 
+
+        <!-- Hoodie collar accent lines --> 
+
+        <path d="M 72 148 Q 100 140 128 148" stroke="rgba(61,142,245,0.3)" stroke-width="0.7" fill="none"/> 
+
+        <!-- Neck --> 
+
+        <rect x="88" y="124" width="24" height="16" rx="5" fill="#c09055"/> 
+
+        <rect x="88" y="124" width="24" height="6" rx="3" fill="rgba(0,0,0,0.13)"/> 
+
+        <!-- Ears --> 
+
+        <ellipse cx="51" cy="100" rx="7" ry="9" fill="#c09055"/><ellipse cx="51" cy="100" rx="4" ry="6" fill="#a87840"/> 
+
+        <ellipse cx="149" cy="100" rx="7" ry="9" fill="#c09055"/><ellipse cx="149" cy="100" rx="4" ry="6" fill="#a87840"/> 
+
+        <!-- Face --> 
+
+        <ellipse cx="100" cy="97" rx="52" ry="56" fill="url(#no-face)"/> 
+
+        <ellipse cx="100" cy="97" rx="52" ry="56" fill="url(#no-rim)"/> 
+
+        <ellipse cx="84" cy="80" rx="22" ry="11" fill="rgba(255,255,255,0.08)"/> 
+
+        <ellipse cx="100" cy="132" rx="40" ry="15" fill="rgba(0,0,0,0.12)"/> 
+
+        <!-- Hair back (medium length) --> 
+
+        <path d="M 50 88 Q 54 48 100 42 Q 146 48 150 88 Q 148 66 144 50 Q 128 14 100 12 Q 72 14 56 50 Q 52 66 50 88 Z" fill="url(#no-hair)"/> 
+
+        <path d="M 50 88 Q 44 108 46 132 Q 48 144 56 148" stroke="#07070c" stroke-width="13" fill="none" stroke-linecap="round"/> 
+
+        <path d="M 150 88 Q 156 108 154 132 Q 152 144 144 148" stroke="#07070c" stroke-width="13" fill="none" stroke-linecap="round"/> 
+
+        <!-- Eye sockets --> 
+
+        <ellipse cx="82" cy="93" rx="15" ry="8.5" fill="rgba(45,15,4,0.18)"/> 
+
+        <ellipse cx="118" cy="93" rx="15" ry="8.5" fill="rgba(45,15,4,0.18)"/> 
+
+        <!-- L eye --> 
+
+        <ellipse cx="82" cy="93" rx="13" ry="7.5" fill="#efebe6"/> 
+
+        <ellipse cx="78" cy="93" rx="4" ry="7.5" fill="rgba(165,145,120,0.26)"/> 
+
+        <ellipse cx="82" cy="93" rx="8" ry="7" fill="url(#no-iris)"/> 
+
+        <ellipse cx="82" cy="93" rx="3.8" ry="3.8" fill="#00040e"/> 
+
+        <ellipse cx="84.5" cy="90.5" rx="2" ry="1.5" fill="rgba(255,255,255,0.9)"/> 
+
+        <ellipse cx="82" cy="93" rx="8.5" ry="7.5" fill="none" stroke="rgba(61,142,245,0.55)" stroke-width="0.9" filter="url(#no-soft)"/> 
+
+        <path d="M 69 88 Q 82 84 95 88" stroke="#280e04" stroke-width="1.6" fill="none" stroke-linecap="round"/> 
+
+        <path d="M 70 88 L 67 85 M 76 86 L 74.5 83 M 82 85 L 82 82 M 88 86 L 90.5 83 M 94 88 L 97 85" stroke="#1c0a02" stroke-width="1.1" fill="none" stroke-linecap="round"/> 
+
+        <!-- R eye --> 
+
+        <ellipse cx="118" cy="93" rx="13" ry="7.5" fill="#efebe6"/> 
+
+        <ellipse cx="122" cy="93" rx="4" ry="7.5" fill="rgba(165,145,120,0.22)"/> 
+
+        <ellipse cx="118" cy="93" rx="8" ry="7" fill="url(#no-iris)"/> 
+
+        <ellipse cx="118" cy="93" rx="3.8" ry="3.8" fill="#00040e"/> 
+
+        <ellipse cx="120.5" cy="90.5" rx="2" ry="1.5" fill="rgba(255,255,255,0.9)"/> 
+
+        <ellipse cx="118" cy="93" rx="8.5" ry="7.5" fill="none" stroke="rgba(61,142,245,0.55)" stroke-width="0.9" filter="url(#no-soft)"/> 
+
+        <path d="M 105 88 Q 118 84 131 88" stroke="#280e04" stroke-width="1.6" fill="none" stroke-linecap="round"/> 
+
+        <path d="M 106 88 L 103 85 M 112 86 L 110.5 83 M 118 85 L 118 82 M 124 86 L 126.5 83 M 130 88 L 133 85" stroke="#1c0a02" stroke-width="1.1" fill="none" stroke-linecap="round"/> 
+
+        <!-- Eyebrows --> 
+
+        <path d="M 68 82 Q 82 77 95 81" stroke="#220e04" stroke-width="2.5" fill="none" stroke-linecap="round"/> 
+
+        <path d="M 105 81 Q 118 77 132 82" stroke="#220e04" stroke-width="2.5" fill="none" stroke-linecap="round"/> 
+
+        <!-- Stubble --> 
+
+        <line x1="76" y1="125" x2="77" y2="124" stroke="rgba(80,40,8,0.35)" stroke-width="0.9"/><line x1="80" y1="127" x2="81" y2="125" stroke="rgba(80,40,8,0.3)" stroke-width="0.9"/><line x1="85" y1="128" x2="86" y2="126" stroke="rgba(80,40,8,0.3)" stroke-width="0.9"/><line x1="90" y1="129" x2="91" y2="127" stroke="rgba(80,40,8,0.28)" stroke-width="0.9"/><line x1="100" y1="130" x2="101" y2="128" stroke="rgba(80,40,8,0.28)" stroke-width="0.9"/><line x1="110" y1="129" x2="111" y2="127" stroke="rgba(80,40,8,0.28)" stroke-width="0.9"/><line x1="116" y1="127" x2="117" y2="125" stroke="rgba(80,40,8,0.3)" stroke-width="0.9"/><line x1="121" y1="125" x2="122" y2="123" stroke="rgba(80,40,8,0.32)" stroke-width="0.9"/><line x1="78" y1="121" x2="79" y2="120" stroke="rgba(80,40,8,0.25)" stroke-width="0.8"/><line x1="120" y1="121" x2="121" y2="120" stroke="rgba(80,40,8,0.25)" stroke-width="0.8"/> 
+
+        <!-- Nose --> 
+
+        <path d="M 100 100 L 100 110" stroke="rgba(140,75,24,0.22)" stroke-width="2" fill="none" stroke-linecap="round"/> 
+
+        <path d="M 93 112 Q 91 114 93 115 Q 96.5 116 100 115" fill="none" stroke="rgba(100,50,14,0.32)" stroke-width="1.1"/> 
+
+        <path d="M 107 112 Q 109 114 107 115 Q 103.5 116 100 115" fill="none" stroke="rgba(100,50,14,0.32)" stroke-width="1.1"/> 
+
+        <ellipse cx="100" cy="112" rx="3" ry="1.4" fill="rgba(245,200,155,0.38)"/> 
+
+        <!-- Lips --> 
+
+        <path d="M 88 122 Q 94 119 100 120 Q 106 119 112 122 Q 106 118 100 117 Q 94 118 88 122" fill="#b06050"/> 
+
+        <path d="M 88 122 Q 94 128 100 129 Q 106 128 112 122" fill="#c07060"/> 
+
+        <path d="M 88 122 Q 100 120 112 122" stroke="#985040" stroke-width="0.8" fill="none"/> 
+
+        <ellipse cx="100" cy="126" rx="4.5" ry="1.8" fill="rgba(255,188,175,0.38)"/> 
+
+        <!-- Cheeks --> 
+
+        <ellipse cx="68" cy="107" rx="12" ry="7" fill="rgba(200,75,50,0.1)"/> 
+
+        <ellipse cx="132" cy="107" rx="12" ry="7" fill="rgba(200,75,50,0.1)"/> 
+
+        <ellipse cx="73" cy="99" rx="8" ry="5" fill="rgba(255,225,195,0.16)"/> 
+
+        <ellipse cx="127" cy="99" rx="8" ry="5" fill="rgba(255,225,195,0.14)"/> 
+
+        <!-- Hair front (messy) --> 
+
+        <path d="M 52 86 Q 56 98 56 115 Q 58 130 60 140" stroke="#08080e" stroke-width="16" fill="none" stroke-linecap="round"/> 
+
+        <path d="M 148 86 Q 144 98 144 115 Q 142 130 140 140" stroke="#08080e" stroke-width="16" fill="none" stroke-linecap="round"/> 
+
+        <path d="M 52 84 Q 60 42 100 36 Q 140 42 148 84 Q 126 55 100 50 Q 74 55 52 84 Z" fill="#0d0d15"/> 
+
+        <!-- Messy hair strands on forehead --> 
+
+        <path d="M 80 52 Q 86 62 84 72" stroke="#0a0a12" stroke-width="8" fill="none" stroke-linecap="round"/> 
+
+        <path d="M 92 50 Q 96 62 94 74" stroke="#0a0a12" stroke-width="6" fill="none" stroke-linecap="round"/> 
+
+        <path d="M 78 50 Q 80 63 78 74" stroke="#09090f" stroke-width="5" fill="none" stroke-linecap="round"/> 
+
+        <!-- Electric blue hair highlight --> 
+
+        <path d="M 68 60 Q 75 48 92 44" stroke="rgba(61,142,245,0.4)" stroke-width="1.3" fill="none" filter="url(#no-soft)" stroke-linecap="round"/> 
+
+        <!-- Lightning on cheek --> 
+
+        <path d="M 142 98 L 148 104 L 143 106 L 150 114" stroke="rgba(61,142,245,0.7)" stroke-width="1.4" fill="none" stroke-linecap="round" filter="url(#no-soft)"/> 
+
+        <!-- Tech earpiece (right ear) --> 
+
+        <rect x="151" y="97" width="8" height="6" rx="2" fill="#0c1228" stroke="rgba(61,142,245,0.6)" stroke-width="0.8"/> 
+
+        <circle cx="157" cy="100" r="1.5" fill="rgba(61,142,245,0.8)" filter="url(#no-soft)"/> 
+
+        <!-- Code brackets floating left --> 
+
+        <g transform="translate(18,62)" filter="url(#no-soft)"> 
+
+          <rect width="30" height="22" rx="3" fill="rgba(4,8,25,0.6)" stroke="rgba(61,142,245,0.4)" stroke-width="0.8"/> 
+
+          <text x="4" y="15" font-family="'Courier New',monospace" font-size="10" fill="rgba(61,142,245,0.85)" font-weight="700">&lt;/&gt;</text> 
+
+          <animate attributeName="opacity" values="0.6;1;0.6" dur="3s" repeatCount="indefinite"/> 
+
+        </g> 
+
+        <!-- Particles --> 
+
+        <circle cx="18" cy="28" r="1.2" fill="rgba(61,142,245,0.6)"><animate attributeName="opacity" values="0.2;0.9;0.2" dur="2.2s" repeatCount="indefinite"/></circle> 
+
+        <circle cx="182" cy="40" r="1.4" fill="rgba(61,142,245,0.5)"><animate attributeName="opacity" values="0.7;0.1;0.7" dur="3.3s" repeatCount="indefinite"/></circle> 
+
+        <circle cx="12" cy="158" r="1" fill="rgba(61,142,245,0.4)"><animate attributeName="opacity" values="0.3;0.8;0.3" dur="2s" repeatCount="indefinite"/></circle> 
+
+        <circle cx="188" cy="168" r="1.2" fill="rgba(61,142,245,0.4)"><animate attributeName="opacity" values="0.5;0.1;0.5" dur="2.6s" repeatCount="indefinite"/></circle> 
+
+        <rect x="0" y="0" width="200" height="1.5" fill="rgba(61,142,245,0.14)" rx="0.5" opacity="0"><animate attributeName="y" values="0;196" dur="4.2s" repeatCount="indefinite"/><animate attributeName="opacity" values="0;0.9;0.9;0" keyTimes="0;0.04;0.96;1" dur="4.2s" repeatCount="indefinite"/></rect> 
+
+        <rect x="8" y="177" width="88" height="14" rx="3.5" fill="rgba(0,8,35,0.78)" stroke="rgba(61,142,245,0.38)" stroke-width="0.8"/> 
+
+        <text x="52" y="187.5" text-anchor="middle" font-family="'Courier New',monospace" font-size="7" fill="rgba(61,142,245,0.88)" font-weight="700" letter-spacing="1.8">AGENTE · #03</text> 
+
+      </svg> 
+
+    </div> 
+
+    <div class="card-body"> 
+
+      <div class="ctop"> 
+
+        <div><div class="cnum">Trabajador #03</div><div class="cname">Noah</div><div class="crole">IA de Desarrollo Full-Stack</div></div> 
+
+        <div class="ibox">💻</div> 
+
+      </div> 
+
+      <p class="desc">Noah construye productos digitales escalables de extremo a extremo. Arquitectura limpia, código probado en producción y atención constante al rendimiento.</p> 
+
+      <div class="slabel">Especialidades</div> 
+
+      <ul class="tasks"> 
+
+        <li><span class="dot"></span>Desarrollo de apps web y móviles</li> 
+
+        <li><span class="dot"></span>Diseño de APIs y arquitectura backend</li> 
+
+        <li><span class="dot"></span>Pipelines CI/CD y despliegue en nube</li> 
+
+      </ul> 
+
+      <div class="channels"><span class="ch">React</span><span class="ch">Node.js</span><span class="ch">AWS</span><span class="ch">Docker</span></div> 
+
+      <hr class="div"> 
+
+      <div class="footer"><div><div class="fl">Entrega Prom.</div><div class="fs">~8 horas</div></div><span class="tier-badge">Dev</span></div> 
+
+    </div> 
+
+    <span class="expand-arrow">▾</span> 
+
+  </div> 
+
+ 
+
+</div><!-- /grid3 --> 
+
+ 
+
+<!-- DETAIL PANELS grid3 --> 
+
+<div id="detail-0" class="detail"> 
+
+  <div class="dlabel">Stack Completo de Capacidades · Sophie</div> 
+
+  <div class="stats-row"> 
+
+    <div class="stat" style="--ac:var(--blue);--ac-glow:var(--blue-glow)"><div class="stat-val">340+</div><div class="stat-lbl">Proyectos</div></div> 
+
+    <div class="stat" style="--ac:var(--blue);--ac-glow:var(--blue-glow)"><div class="stat-val">98%</div><div class="stat-lbl">Satisfacción</div></div> 
+
+    <div class="stat" style="--ac:var(--blue);--ac-glow:var(--blue-glow)"><div class="stat-val">24/7</div><div class="stat-lbl">Disponibilidad</div></div> 
+
+  </div> 
+
+  <div class="dlabel">Habilidades y Herramientas</div> 
+
+  <div class="chips"><span class="chip">Identidad de Marca</span><span class="chip">Diseño UI</span><span class="chip">Motion Graphics</span><span class="chip">Tipografía</span><span class="chip">Teoría del Color</span><span class="chip">Diseño Editorial</span><span class="chip">Iconografía</span><span class="chip">Ilustración</span><span class="chip">Edición de Foto</span><span class="chip">Arte NFT</span><span class="chip">Figma Tokens</span><span class="chip">Sistemas de Diseño</span></div> 
+
+</div> 
+
+<div id="detail-1" class="detail"> 
+
+  <div class="dlabel">Stack Completo de Capacidades · Riley</div> 
+
+  <div class="stats-row"> 
+
+    <div class="stat" style="--ac:var(--green);--ac-glow:var(--green-glow)"><div class="stat-val">1.2M+</div><div class="stat-lbl">Filas Procesadas</div></div> 
+
+    <div class="stat" style="--ac:var(--green);--ac-glow:var(--green-glow)"><div class="stat-val">99.8%</div><div class="stat-lbl">Precisión</div></div> 
+
+    <div class="stat" style="--ac:var(--green);--ac-glow:var(--green-glow)"><div class="stat-val">&lt;1s</div><div class="stat-lbl">Tiempo de Consulta</div></div> 
+
+  </div> 
+
+  <div class="dlabel">Habilidades y Herramientas</div> 
+
+  <div class="chips"><span class="chip">Machine Learning</span><span class="chip">Limpieza de Datos</span><span class="chip">Power BI</span><span class="chip">Looker Studio</span><span class="chip">Pruebas A/B</span><span class="chip">Pronósticos</span><span class="chip">Pipelines ETL</span><span class="chip">Análisis NLP</span><span class="chip">Pandas</span><span class="chip">TensorFlow</span><span class="chip">Spark</span><span class="chip">Airflow</span></div> 
+
+</div> 
+
+<div id="detail-2" class="detail"> 
+
+  <div class="dlabel">Stack Completo de Capacidades · Noah</div> 
+
+  <div class="stats-row"> 
+
+    <div class="stat" style="--ac:var(--blue);--ac-glow:var(--blue-glow)"><div class="stat-val">500+</div><div class="stat-lbl">Repositorios</div></div> 
+
+    <div class="stat" style="--ac:var(--blue);--ac-glow:var(--blue-glow)"><div class="stat-val">99.9%</div><div class="stat-lbl">Tiempo Activo</div></div> 
+
+    <div class="stat" style="--ac:var(--blue);--ac-glow:var(--blue-glow)"><div class="stat-val">0</div><div class="stat-lbl">Errores en Prod.</div></div> 
+
+  </div> 
+
+  <div class="dlabel">Habilidades y Herramientas</div> 
+
+  <div class="chips"><span class="chip">TypeScript</span><span class="chip">Python</span><span class="chip">Next.js</span><span class="chip">GraphQL</span><span class="chip">PostgreSQL</span><span class="chip">Redis</span><span class="chip">Kubernetes</span><span class="chip">Terraform</span><span class="chip">Microservicios</span><span class="chip">WebSockets</span><span class="chip">Testing (Jest)</span><span class="chip">Auditorías de Seguridad</span></div> 
+
+</div> 
+
+ 
+
+<!-- TRABAJADORES PREMIUM --> 
+
+<div class="section-title">Trabajadores Premium</div> 
+
+<div class="grid2"> 
+
+ 
+
+  <!-- ══════════ LUKE ══════════ --> 
+
+  <div class="card gold" onclick="toggleDetail(this)"> 
+
+    <div class="shimmer"></div> 
+
+    <div class="avatar-wrap"> 
+
+      <svg viewBox="0 0 200 196" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"> 
+
+        <defs> 
+
+          <radialGradient id="lu-bg" cx="50%" cy="35%" r="70%"><stop offset="0%" stop-color="#1a1005"/><stop offset="100%" stop-color="#060300"/></radialGradient> 
+
+          <radialGradient id="lu-face" cx="36%" cy="28%" r="68%"><stop offset="0%" stop-color="#cc9050"/><stop offset="50%" stop-color="#a87030"/><stop offset="100%" stop-color="#6a4010"/></radialGradient> 
+
+          <linearGradient id="lu-rim" x1="0%" y1="50%" x2="100%" y2="50%"><stop offset="0%" stop-color="#e8b84b" stop-opacity="0.38"/><stop offset="28%" stop-color="#e8b84b" stop-opacity="0"/></linearGradient> 
+
+          <radialGradient id="lu-iris" cx="30%" cy="28%" r="60%"><stop offset="0%" stop-color="#ffe898"/><stop offset="48%" stop-color="#e8b84b"/><stop offset="100%" stop-color="#6a4808"/></radialGradient> 
+
+          <linearGradient id="lu-hair" x1="30%" y1="0%" x2="70%" y2="100%"><stop offset="0%" stop-color="#1c1205"/><stop offset="100%" stop-color="#0c0802"/></linearGradient> 
+
+          <linearGradient id="lu-body" x1="50%" y1="0%" x2="50%" y2="100%"><stop offset="0%" stop-color="#1a1205"/><stop offset="100%" stop-color="#080500"/></linearGradient> 
+
+          <filter id="lu-glow" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="3.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter> 
+
+          <filter id="lu-soft" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="1.8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter> 
+
+        </defs> 
+
+        <rect width="200" height="196" fill="url(#lu-bg)"/> 
+
+        <!-- Gold BG lines --> 
+
+        <line x1="0" y1="50" x2="200" y2="50" stroke="rgba(232,184,75,0.06)" stroke-width="0.5"/> 
+
+        <line x1="0" y1="138" x2="200" y2="138" stroke="rgba(232,184,75,0.05)" stroke-width="0.5"/> 
+
+        <line x1="40" y1="0" x2="40" y2="196" stroke="rgba(232,184,75,0.04)" stroke-width="0.5"/> 
+
+        <line x1="160" y1="0" x2="160" y2="196" stroke="rgba(232,184,75,0.04)" stroke-width="0.5"/> 
+
+        <path d="M 158 40 L 178 40 L 178 56 L 192 56" stroke="rgba(232,184,75,0.28)" stroke-width="0.9" fill="none"/> 
+
+        <circle cx="192" cy="56" r="2" fill="rgba(232,184,75,0.5)"/> 
+
+        <path d="M 8 90 L 24 90 L 24 75 L 38 75" stroke="rgba(232,184,75,0.2)" stroke-width="0.8" fill="none"/> 
+
+        <ellipse cx="100" cy="118" rx="65" ry="74" fill="rgba(100,60,0,0.12)"/> 
+
+        <!-- Gold energy rings --> 
+
+        <ellipse cx="100" cy="105" rx="80" ry="85" fill="none" stroke="rgba(232,184,75,0.07)" stroke-width="1.5"><animate attributeName="r" values="80;84;80" dur="3s" repeatCount="indefinite"/></ellipse> 
+
+        <ellipse cx="100" cy="105" rx="68" ry="72" fill="none" stroke="rgba(232,184,75,0.1)" stroke-width="1"><animate attributeName="r" values="68;72;68" dur="2.5s" repeatCount="indefinite"/></ellipse> 
+
+        <!-- Body - gold suit --> 
+
+        <path d="M 0 196 L 0 168 Q 32 155 60 148 Q 78 143 100 140 Q 122 143 140 148 Q 168 155 200 168 L 200 196 Z" fill="url(#lu-body)"/> 
+
+        <path d="M 70 148 Q 100 138 130 148 L 124 138 Q 100 130 76 138 Z" fill="#181005" stroke="rgba(232,184,75,0.6)" stroke-width="0.9"/> 
+
+        <path d="M 70 148 Q 100 138 130 148" stroke="#e8b84b" stroke-width="1.3" fill="none" stroke-opacity="0.75" filter="url(#lu-soft)"/> 
+
+        <!-- Lapel gold details --> 
+
+        <path d="M 76 140 L 70 160 M 124 140 L 130 160" stroke="rgba(232,184,75,0.3)" stroke-width="0.8" fill="none"/> 
+
+        <!-- Neck --> 
+
+        <rect x="88" y="128" width="24" height="16" rx="5" fill="#a87030"/> 
+
+        <rect x="88" y="128" width="24" height="6" rx="3" fill="rgba(0,0,0,0.13)"/> 
+
+        <!-- Ears --> 
+
+        <ellipse cx="51" cy="102" rx="7" ry="9" fill="#a87030"/><ellipse cx="51" cy="102" rx="4" ry="6" fill="#906020"/> 
+
+        <ellipse cx="149" cy="102" rx="7" ry="9" fill="#a87030"/><ellipse cx="149" cy="102" rx="4" ry="6" fill="#906020"/> 
+
+        <!-- Face --> 
+
+        <ellipse cx="100" cy="100" rx="52" ry="56" fill="url(#lu-face)"/> 
+
+        <ellipse cx="100" cy="100" rx="52" ry="56" fill="url(#lu-rim)"/> 
+
+        <ellipse cx="84" cy="83" rx="22" ry="11" fill="rgba(255,255,255,0.09)"/> 
+
+        <ellipse cx="100" cy="135" rx="40" ry="16" fill="rgba(0,0,0,0.13)"/> 
+
+        <!-- Hair back (swept right) --> 
+
+        <path d="M 52 86 Q 56 48 100 42 Q 144 48 148 86 Q 146 64 140 48 Q 124 12 100 10 Q 76 12 60 48 Q 54 64 52 86 Z" fill="url(#lu-hair)"/> 
+
+        <path d="M 52 86 Q 46 108 48 132 Q 50 144 58 148" stroke="#100c02" stroke-width="14" fill="none" stroke-linecap="round"/> 
+
+        <path d="M 148 86 Q 154 108 152 132 Q 150 144 142 148" stroke="#100c02" stroke-width="14" fill="none" stroke-linecap="round"/> 
+
+        <!-- Eye sockets --> 
+
+        <ellipse cx="82" cy="94" rx="15" ry="8.5" fill="rgba(40,12,2,0.2)"/> 
+
+        <ellipse cx="118" cy="94" rx="15" ry="8.5" fill="rgba(40,12,2,0.2)"/> 
+
+        <!-- L eye --> 
+
+        <ellipse cx="82" cy="94" rx="13" ry="7.5" fill="#ede8e2"/> 
+
+        <ellipse cx="78" cy="94" rx="4" ry="7.5" fill="rgba(160,135,108,0.26)"/> 
+
+        <ellipse cx="82" cy="94" rx="8" ry="7" fill="url(#lu-iris)"/> 
+
+        <ellipse cx="82" cy="94" rx="3.8" ry="3.8" fill="#0c0600"/> 
+
+        <ellipse cx="84.5" cy="91.5" rx="2" ry="1.5" fill="rgba(255,255,255,0.9)"/> 
+
+        <ellipse cx="82" cy="94" rx="8.5" ry="7.5" fill="none" stroke="rgba(232,184,75,0.6)" stroke-width="0.9" filter="url(#lu-soft)"/> 
+
+        <path d="M 69 89 Q 82 85 95 89" stroke="#241002" stroke-width="1.6" fill="none" stroke-linecap="round"/> 
+
+        <path d="M 70 89 L 67 86 M 76 87 L 74.5 84 M 82 86 L 82 83 M 88 87 L 90.5 84 M 94 89 L 97 86" stroke="#180e00" stroke-width="1.1" fill="none" stroke-linecap="round"/> 
+
+        <!-- R eye --> 
+
+        <ellipse cx="118" cy="94" rx="13" ry="7.5" fill="#ede8e2"/> 
+
+        <ellipse cx="122" cy="94" rx="4" ry="7.5" fill="rgba(160,135,108,0.22)"/> 
+
+        <ellipse cx="118" cy="94" rx="8" ry="7" fill="url(#lu-iris)"/> 
+
+        <ellipse cx="118" cy="94" rx="3.8" ry="3.8" fill="#0c0600"/> 
+
+        <ellipse cx="120.5" cy="91.5" rx="2" ry="1.5" fill="rgba(255,255,255,0.9)"/> 
+
+        <ellipse cx="118" cy="94" rx="8.5" ry="7.5" fill="none" stroke="rgba(232,184,75,0.6)" stroke-width="0.9" filter="url(#lu-soft)"/> 
+
+        <path d="M 105 89 Q 118 85 131 89" stroke="#241002" stroke-width="1.6" fill="none" stroke-linecap="round"/> 
+
+        <path d="M 106 89 L 103 86 M 112 87 L 110.5 84 M 118 86 L 118 83 M 124 87 L 126.5 84 M 130 89 L 133 86" stroke="#180e00" stroke-width="1.1" fill="none" stroke-linecap="round"/> 
+
+        <!-- Eyebrows (confident arch) --> 
+
+        <path d="M 68 83 Q 82 78 95 83" stroke="#1e0e01" stroke-width="2.8" fill="none" stroke-linecap="round"/> 
+
+        <path d="M 105 83 Q 118 78 132 83" stroke="#1e0e01" stroke-width="2.8" fill="none" stroke-linecap="round"/> 
+
+        <!-- Nose --> 
+
+        <path d="M 100 101 L 100 111" stroke="rgba(130,70,18,0.24)" stroke-width="2" fill="none" stroke-linecap="round"/> 
+
+        <path d="M 93 113 Q 91 115 93 116 Q 96.5 117 100 116" fill="none" stroke="rgba(95,45,10,0.35)" stroke-width="1.2"/> 
+
+        <path d="M 107 113 Q 109 115 107 116 Q 103.5 117 100 116" fill="none" stroke="rgba(95,45,10,0.35)" stroke-width="1.2"/> 
+
+        <ellipse cx="100" cy="113" rx="3" ry="1.4" fill="rgba(240,195,140,0.4)"/> 
+
+        <!-- Lips - slight confident smile --> 
+
+        <path d="M 87 124 Q 93 121 100 122 Q 107 121 113 124 Q 107 119 100 118 Q 93 119 87 124" fill="#9a5840"/> 
+
+        <path d="M 87 124 Q 93 131 100 132 Q 107 131 113 124" fill="#b06850"/> 
+
+        <path d="M 87 124 Q 100 122 113 124" stroke="#884838" stroke-width="0.9" fill="none"/> 
+
+        <!-- Smile curves --> 
+
+        <path d="M 87 124 Q 84 128 86 131" stroke="#9a5840" stroke-width="1.2" fill="none" stroke-linecap="round"/> 
+
+        <path d="M 113 124 Q 116 128 114 131" stroke="#9a5840" stroke-width="1.2" fill="none" stroke-linecap="round"/> 
+
+        <ellipse cx="100" cy="128" rx="5" ry="2" fill="rgba(255,190,165,0.38)"/> 
+
+        <!-- Cheeks --> 
+
+        <ellipse cx="68" cy="110" rx="12" ry="7" fill="rgba(200,80,40,0.1)"/> 
+
+        <ellipse cx="132" cy="110" rx="12" ry="7" fill="rgba(200,80,40,0.1)"/> 
+
+        <ellipse cx="73" cy="102" rx="9" ry="5" fill="rgba(255,220,180,0.18)"/> 
+
+        <ellipse cx="127" cy="102" rx="9" ry="5" fill="rgba(255,220,180,0.16)"/> 
+
+        <!-- Hair front (styled swept) --> 
+
+        <path d="M 52 84 Q 56 60 70 48 Q 90 56 110 50 Q 130 46 148 58 Q 148 84 148 84 Q 138 66 110 58 Q 82 64 62 78 Z" fill="#100a02"/> 
+
+        <!-- Gold hair streaks --> 
+
+        <path d="M 72 58 Q 90 48 114 50" stroke="rgba(232,184,75,0.55)" stroke-width="1.5" fill="none" filter="url(#lu-soft)" stroke-linecap="round"/> 
+
+        <path d="M 66 68 Q 80 56 95 52" stroke="rgba(232,184,75,0.38)" stroke-width="1.1" fill="none" filter="url(#lu-soft)" stroke-linecap="round"/> 
+
+        <!-- Gold circuit on cheek --> 
+
+        <path d="M 140 98 L 152 98 L 152 110 L 164 110" stroke="rgba(232,184,75,0.45)" stroke-width="0.9" fill="none"/> 
+
+        <circle cx="164" cy="110" r="1.8" fill="rgba(232,184,75,0.7)" filter="url(#lu-soft)"/> 
+
+        <circle cx="152" cy="98" r="1.2" fill="rgba(232,184,75,0.55)"/> 
+
+        <!-- Gold stud earring --> 
+
+        <circle cx="44" cy="106" r="3.5" fill="rgba(232,184,75,0.75)" filter="url(#lu-glow)"/> 
+
+        <circle cx="44" cy="106" r="1.8" fill="rgba(255,240,180,0.95)"/> 
+
+        <!-- Arrow hologram (right side floating) --> 
+
+        <g transform="translate(166,55)" filter="url(#lu-soft)"> 
+
+          <rect width="26" height="22" rx="3" fill="rgba(20,12,0,0.65)" stroke="rgba(232,184,75,0.45)" stroke-width="0.8"/> 
+
+          <line x1="5" y1="16" x2="5" y2="6" stroke="rgba(232,184,75,0.8)" stroke-width="1.2" stroke-linecap="round"/> 
+
+          <line x1="5" y1="6" x2="12" y2="13" stroke="rgba(232,184,75,0.8)" stroke-width="1.2" stroke-linecap="round"/> 
+
+          <line x1="5" y1="6" x2="-2" y2="13" stroke="rgba(232,184,75,0.8)" stroke-width="1.2" stroke-linecap="round"/> 
+
+          <line x1="13" y1="14" x2="13" y2="8" stroke="rgba(232,184,75,0.6)" stroke-width="1" stroke-linecap="round"/> 
+
+          <line x1="19" y1="16" x2="19" y2="5" stroke="rgba(232,184,75,0.7)" stroke-width="1" stroke-linecap="round"/> 
+
+          <animate attributeName="opacity" values="0.7;1;0.7" dur="2.2s" repeatCount="indefinite"/> 
+
+        </g> 
+
+        <!-- Particles --> 
+
+        <circle cx="20" cy="28" r="1.2" fill="rgba(232,184,75,0.6)"><animate attributeName="opacity" values="0.2;0.9;0.2" dur="2.4s" repeatCount="indefinite"/></circle> 
+
+        <circle cx="180" cy="38" r="1.4" fill="rgba(232,184,75,0.5)"><animate attributeName="opacity" values="0.7;0.1;0.7" dur="3.2s" repeatCount="indefinite"/></circle> 
+
+        <circle cx="14" cy="160" r="1" fill="rgba(232,184,75,0.4)"><animate attributeName="opacity" values="0.3;0.8;0.3" dur="1.9s" repeatCount="indefinite"/></circle> 
+
+        <circle cx="186" cy="170" r="1.2" fill="rgba(232,184,75,0.4)"><animate attributeName="opacity" values="0.5;0.1;0.5" dur="2.8s" repeatCount="indefinite"/></circle> 
+
+        <rect x="0" y="0" width="200" height="1.5" fill="rgba(232,184,75,0.14)" rx="0.5" opacity="0"><animate attributeName="y" values="0;196" dur="4.4s" repeatCount="indefinite"/><animate attributeName="opacity" values="0;0.9;0.9;0" keyTimes="0;0.04;0.96;1" dur="4.4s" repeatCount="indefinite"/></rect> 
+
+        <rect x="8" y="177" width="88" height="14" rx="3.5" fill="rgba(25,12,0,0.78)" stroke="rgba(232,184,75,0.42)" stroke-width="0.8"/> 
+
+        <text x="52" y="187.5" text-anchor="middle" font-family="'Courier New',monospace" font-size="7" fill="rgba(232,184,75,0.9)" font-weight="700" letter-spacing="1.8">AGENTE · #04</text> 
+
+      </svg> 
+
+    </div> 
+
+    <div class="card-body"> 
+
+      <div class="premium-pill">★ Premium · Crecimiento</div> 
+
+      <div class="ctop"> 
+
+        <div><div class="cnum">Trabajador #04</div><div class="cname">Luke</div><div class="crole">IA de Growth & Marketing</div></div> 
+
+        <div class="ibox">🚀</div> 
+
+      </div> 
+
+      <p class="desc">Luke diseña estrategias de crecimiento a escala. Desde optimización de embudos hasta campañas virales, está obsesionado con un solo indicador: los resultados.</p> 
+
+      <div class="slabel">Especialidades</div> 
+
+      <ul class="tasks"> 
+
+        <li><span class="dot"></span>Marketing de performance y estrategia de medios pagados</li> 
+
+        <li><span class="dot"></span>SEO/SEM, embudos de contenido y generación de leads</li> 
+
+        <li><span class="dot"></span>Automatización de email y flujos de ciclo de vida en CRM</li> 
+
+        <li><span class="dot"></span>Growth hacking e ingeniería de bucles virales</li> 
+
+      </ul> 
+
+      <div class="channels"><span class="ch">Google Ads</span><span class="ch">Meta Ads</span><span class="ch">HubSpot</span><span class="ch">Klaviyo</span><span class="ch">Semrush</span></div> 
+
+      <hr class="div"> 
+
+      <div class="footer"><div><div class="fl">ROAS Promedio</div><div class="fs">4.8× Ingresos</div></div><span class="tier-badge">Dorado</span></div> 
+
+    </div> 
+
+    <span class="expand-arrow">▾</span> 
+
+  </div> 
+
+ 
+
+  <!-- ══════════ LIAM ══════════ --> 
+
+  <div class="card purple" onclick="toggleDetail(this)"> 
+
+    <div class="shimmer"></div> 
+
+    <div class="avatar-wrap"> 
+
+      <svg viewBox="0 0 200 196" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"> 
+
+        <defs> 
+
+          <radialGradient id="li-bg" cx="50%" cy="35%" r="70%"><stop offset="0%" stop-color="#0e0a1c"/><stop offset="100%" stop-color="#040208"/></radialGradient> 
+
+          <radialGradient id="li-face" cx="38%" cy="28%" r="68%"><stop offset="0%" stop-color="#e8cfc0"/><stop offset="50%" stop-color="#c8a888"/><stop offset="100%" stop-color="#906858"/></radialGradient> 
+
+          <linearGradient id="li-rim" x1="0%" y1="50%" x2="100%" y2="50%"><stop offset="0%" stop-color="#a78bfa" stop-opacity="0.4"/><stop offset="28%" stop-color="#a78bfa" stop-opacity="0"/></linearGradient> 
+
+          <radialGradient id="li-iris" cx="28%" cy="26%" r="58%"><stop offset="0%" stop-color="#ddd0ff"/><stop offset="46%" stop-color="#a78bfa"/><stop offset="100%" stop-color="#280880"/></radialGradient> 
+
+          <linearGradient id="li-hair" x1="50%" y1="0%" x2="50%" y2="100%"><stop offset="0%" stop-color="#0e0c18"/><stop offset="100%" stop-color="#060410"/></linearGradient> 
+
+          <linearGradient id="li-body" x1="50%" y1="0%" x2="50%" y2="100%"><stop offset="0%" stop-color="#100c20"/><stop offset="100%" stop-color="#050210"/></linearGradient> 
+
+          <filter id="li-glow" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter> 
+
+          <filter id="li-soft" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter> 
+
+          <filter id="li-strong" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter> 
+
+        </defs> 
+
+        <rect width="200" height="196" fill="url(#li-bg)"/> 
+
+        <!-- Purple BG geometric pattern --> 
+
+        <polygon points="30,0 55,0 55,25 30,25" fill="none" stroke="rgba(167,139,250,0.08)" stroke-width="0.8"/> 
+
+        <polygon points="145,0 170,0 170,25 145,25" fill="none" stroke="rgba(167,139,250,0.08)" stroke-width="0.8"/> 
+
+        <polygon points="0,170 25,170 25,196 0,196" fill="none" stroke="rgba(167,139,250,0.06)" stroke-width="0.8"/> 
+
+        <polygon points="175,170 200,170 200,196 175,196" fill="none" stroke="rgba(167,139,250,0.06)" stroke-width="0.8"/> 
+
+        <line x1="0" y1="50" x2="200" y2="50" stroke="rgba(167,139,250,0.06)" stroke-width="0.5"/> 
+
+        <line x1="0" y1="138" x2="200" y2="138" stroke="rgba(167,139,250,0.05)" stroke-width="0.5"/> 
+
+        <line x1="40" y1="0" x2="40" y2="196" stroke="rgba(167,139,250,0.04)" stroke-width="0.5"/> 
+
+        <line x1="160" y1="0" x2="160" y2="196" stroke="rgba(167,139,250,0.04)" stroke-width="0.5"/> 
+
+        <!-- Purple circuits --> 
+
+        <path d="M 158 38 L 178 38 L 178 55 L 192 55" stroke="rgba(167,139,250,0.32)" stroke-width="0.9" fill="none"/> 
+
+        <circle cx="192" cy="55" r="2" fill="rgba(167,139,250,0.55)"/> 
+
+        <path d="M 8 88 L 24 88 L 24 72 L 38 72" stroke="rgba(167,139,250,0.22)" stroke-width="0.8" fill="none"/> 
+
+        <circle cx="38" cy="72" r="1.5" fill="rgba(167,139,250,0.42)"/> 
+
+        <!-- Extra circuit bottom --> 
+
+        <path d="M 10 165 L 28 165 L 28 178 L 10 178 L 10 165" fill="none" stroke="rgba(167,139,250,0.15)" stroke-width="0.7"/> 
+
+        <path d="M 172 165 L 190 165 L 190 178 L 172 178 L 172 165" fill="none" stroke="rgba(167,139,250,0.12)" stroke-width="0.7"/> 
+
+        <!-- Purple aura (strongest glow of all characters) --> 
+
+        <ellipse cx="100" cy="112" rx="68" ry="78" fill="rgba(60,20,120,0.14)"/> 
+
+        <ellipse cx="100" cy="100" rx="52" ry="58" fill="rgba(80,30,160,0.08)"/> 
+
+        <!-- Elegant body/suit --> 
+
+        <path d="M 0 196 L 0 166 Q 32 150 62 143 Q 80 138 100 135 Q 120 138 138 143 Q 168 150 200 166 L 200 196 Z" fill="url(#li-body)"/> 
+
+        <path d="M 70 143 Q 100 133 130 143 L 124 132 Q 100 124 76 132 Z" fill="#100c20" stroke="rgba(167,139,250,0.65)" stroke-width="0.9"/> 
+
+        <path d="M 70 143 Q 100 133 130 143" stroke="#a78bfa" stroke-width="1.3" fill="none" stroke-opacity="0.8" filter="url(#li-soft)"/> 
+
+        <!-- Shoulder geometric accents --> 
+
+        <path d="M 30 178 L 42 162 L 54 168" fill="none" stroke="rgba(167,139,250,0.2)" stroke-width="0.8"/> 
+
+        <path d="M 170 178 L 158 162 L 146 168" fill="none" stroke="rgba(167,139,250,0.2)" stroke-width="0.8"/> 
+
+        <!-- Neck --> 
+
+        <rect x="88" y="122" width="24" height="17" rx="5" fill="#c8a888"/> 
+
+        <rect x="88" y="122" width="24" height="6" rx="3" fill="rgba(0,0,0,0.14)"/> 
+
+        <!-- Ears --> 
+
+        <ellipse cx="51" cy="100" rx="7" ry="9" fill="#c8a888"/><ellipse cx="51" cy="100" rx="4" ry="6" fill="#a88870"/> 
+
+        <ellipse cx="149" cy="100" rx="7" ry="9" fill="#c8a888"/><ellipse cx="149" cy="100" rx="4" ry="6" fill="#a88870"/> 
+
+        <!-- Face --> 
+
+        <ellipse cx="100" cy="98" rx="52" ry="56" fill="url(#li-face)"/> 
+
+        <ellipse cx="100" cy="98" rx="52" ry="56" fill="url(#li-rim)"/> 
+
+        <ellipse cx="84" cy="81" rx="22" ry="11" fill="rgba(255,255,255,0.09)"/> 
+
+        <ellipse cx="100" cy="133" rx="40" ry="16" fill="rgba(0,0,0,0.12)"/> 
+
+        <!-- Hair back (slicked, precise) --> 
+
+        <path d="M 52 84 Q 56 46 100 40 Q 144 46 148 84 Q 146 62 140 46 Q 124 10 100 8 Q 76 10 60 46 Q 54 62 52 84 Z" fill="url(#li-hair)"/> 
+
+        <path d="M 52 84 Q 46 106 48 130 Q 50 142 58 146" stroke="#07050e" stroke-width="14" fill="none" stroke-linecap="round"/> 
+
+        <path d="M 148 84 Q 154 106 152 130 Q 150 142 142 146" stroke="#07050e" stroke-width="14" fill="none" stroke-linecap="round"/> 
+
+        <!-- Eye sockets --> 
+
+        <ellipse cx="82" cy="92" rx="15" ry="8.5" fill="rgba(30,10,40,0.22)"/> 
+
+        <ellipse cx="118" cy="92" rx="15" ry="8.5" fill="rgba(30,10,40,0.22)"/> 
+
+        <!-- L eye (intense purple glow - most dramatic of all) --> 
+
+        <ellipse cx="82" cy="92" rx="13" ry="7.5" fill="#eeeaf8"/> 
+
+        <ellipse cx="78" cy="92" rx="4" ry="7.5" fill="rgba(158,138,200,0.25)"/> 
+
+        <ellipse cx="82" cy="92" rx="8" ry="7" fill="url(#li-iris)"/> 
+
+        <ellipse cx="82" cy="92" rx="3.8" ry="3.8" fill="#0a0015"/> 
+
+        <ellipse cx="84.5" cy="89.5" rx="2" ry="1.5" fill="rgba(255,255,255,0.92)"/> 
+
+        <ellipse cx="82" cy="92" rx="9" ry="8" fill="none" stroke="rgba(167,139,250,0.7)" stroke-width="1" filter="url(#li-strong)"/> 
+
+        <path d="M 69 87 Q 82 83 95 87" stroke="#220840" stroke-width="1.7" fill="none" stroke-linecap="round"/> 
+
+        <path d="M 70 87 L 67 84 M 76 85 L 74.5 82 M 82 84 L 82 81 M 88 85 L 90.5 82 M 94 87 L 97 84" stroke="#180630" stroke-width="1.1" fill="none" stroke-linecap="round"/> 
+
+        <!-- R eye --> 
+
+        <ellipse cx="118" cy="92" rx="13" ry="7.5" fill="#eeeaf8"/> 
+
+        <ellipse cx="122" cy="92" rx="4" ry="7.5" fill="rgba(158,138,200,0.22)"/> 
+
+        <ellipse cx="118" cy="92" rx="8" ry="7" fill="url(#li-iris)"/> 
+
+        <ellipse cx="118" cy="92" rx="3.8" ry="3.8" fill="#0a0015"/> 
+
+        <ellipse cx="120.5" cy="89.5" rx="2" ry="1.5" fill="rgba(255,255,255,0.92)"/> 
+
+        <ellipse cx="118" cy="92" rx="9" ry="8" fill="none" stroke="rgba(167,139,250,0.7)" stroke-width="1" filter="url(#li-strong)"/> 
+
+        <path d="M 105 87 Q 118 83 131 87" stroke="#220840" stroke-width="1.7" fill="none" stroke-linecap="round"/> 
+
+        <path d="M 106 87 L 103 84 M 112 85 L 110.5 82 M 118 84 L 118 81 M 124 85 L 126.5 82 M 130 87 L 133 84" stroke="#180630" stroke-width="1.1" fill="none" stroke-linecap="round"/> 
+
+        <!-- Eyebrows (precise, sharp) --> 
+
+        <path d="M 68 81 Q 82 76.5 95 80" stroke="#180630" stroke-width="2.6" fill="none" stroke-linecap="round"/> 
+
+        <path d="M 105 80 Q 118 76.5 132 81" stroke="#180630" stroke-width="2.6" fill="none" stroke-linecap="round"/> 
+
+        <!-- Nose --> 
+
+        <path d="M 100 99 L 100 109" stroke="rgba(120,72,54,0.24)" stroke-width="2" fill="none" stroke-linecap="round"/> 
+
+        <path d="M 93 111 Q 91 113 93 114 Q 96.5 115 100 114" fill="none" stroke="rgba(90,52,38,0.35)" stroke-width="1.2"/> 
+
+        <path d="M 107 111 Q 109 113 107 114 Q 103.5 115 100 114" fill="none" stroke="rgba(90,52,38,0.35)" stroke-width="1.2"/> 
+
+        <ellipse cx="100" cy="111" rx="3" ry="1.4" fill="rgba(245,215,195,0.38)"/> 
+
+        <!-- Lips (composed, slight close) --> 
+
+        <path d="M 89 121 Q 95 118.5 100 119.5 Q 105 118.5 111 121 Q 105 117 100 116 Q 95 117 89 121" fill="#a07868"/> 
+
+        <path d="M 89 121 Q 95 127 100 128 Q 105 127 111 121" fill="#b08878"/> 
+
+        <path d="M 89 121 Q 100 119.5 111 121" stroke="#8a5848" stroke-width="0.9" fill="none"/> 
+
+        <ellipse cx="100" cy="125" rx="4.5" ry="1.8" fill="rgba(255,200,185,0.35)"/> 
+
+        <!-- Cheeks --> 
+
+        <ellipse cx="68" cy="108" rx="12" ry="7" fill="rgba(168,65,150,0.08)"/> 
+
+        <ellipse cx="132" cy="108" rx="12" ry="7" fill="rgba(168,65,150,0.08)"/> 
+
+        <ellipse cx="73" cy="100" rx="9" ry="5" fill="rgba(255,228,215,0.17)"/> 
+
+        <ellipse cx="127" cy="100" rx="9" ry="5" fill="rgba(255,228,215,0.15)"/> 
+
+        <!-- Hair front (slicked back, very precise) --> 
+
+        <path d="M 52 82 Q 58 45 100 38 Q 142 45 148 82 Q 126 54 100 48 Q 74 54 52 82 Z" fill="#0b0914"/> 
+
+        <!-- Silver hair sheen --> 
+
+        <path d="M 78 52 Q 100 44 122 52" stroke="rgba(200,180,255,0.45)" stroke-width="1.5" fill="none" filter="url(#li-soft)" stroke-linecap="round"/> 
+
+        <path d="M 72 62 Q 86 50 100 46 Q 114 50 128 62" stroke="rgba(167,139,250,0.25)" stroke-width="1" fill="none" filter="url(#li-soft)" stroke-linecap="round"/> 
+
+        <!-- Purple circuit cheeks (both sides - most circuit decoration) --> 
+
+        <path d="M 140 96 L 152 96 L 152 108 L 164 108" stroke="rgba(167,139,250,0.48)" stroke-width="0.9" fill="none"/> 
+
+        <circle cx="164" cy="108" r="1.8" fill="rgba(167,139,250,0.7)" filter="url(#li-soft)"/> 
+
+        <circle cx="152" cy="96" r="1.2" fill="rgba(167,139,250,0.55)"/> 
+
+        <path d="M 60 96 L 48 96 L 48 108 L 36 108" stroke="rgba(167,139,250,0.42)" stroke-width="0.9" fill="none"/> 
+
+        <circle cx="36" cy="108" r="1.8" fill="rgba(167,139,250,0.65)" filter="url(#li-soft)"/> 
+
+        <circle cx="48" cy="96" r="1.2" fill="rgba(167,139,250,0.5)"/> 
+
+        <!-- Geometric headpiece element (right side) --> 
+
+        <g filter="url(#li-soft)"> 
+
+          <polygon points="155,52 168,44 175,55 162,63" fill="rgba(30,15,60,0.6)" stroke="rgba(167,139,250,0.55)" stroke-width="0.9"/> 
+
+          <circle cx="163" cy="54" r="3" fill="rgba(167,139,250,0.6)"/> 
+
+          <line x1="148" y1="70" x2="157" y2="60" stroke="rgba(167,139,250,0.4)" stroke-width="0.8"/> 
+
+        </g> 
+
+        <!-- Multiple holographic data elements left side --> 
+
+        <g transform="translate(14,48)" filter="url(#li-soft)"> 
+
+          <rect width="22" height="18" rx="2" fill="rgba(10,5,25,0.65)" stroke="rgba(167,139,250,0.42)" stroke-width="0.8"/> 
+
+          <circle cx="5" cy="9" r="3" fill="none" stroke="rgba(167,139,250,0.7)" stroke-width="1"/> 
+
+          <circle cx="5" cy="9" r="1.5" fill="rgba(167,139,250,0.6)"/> 
+
+          <line x1="11" y1="6" x2="19" y2="6" stroke="rgba(167,139,250,0.6)" stroke-width="1"/> 
+
+          <line x1="11" y1="9" x2="17" y2="9" stroke="rgba(167,139,250,0.45)" stroke-width="1"/> 
+
+          <line x1="11" y1="12" x2="19" y2="12" stroke="rgba(167,139,250,0.35)" stroke-width="1"/> 
+
+          <animate attributeName="opacity" values="0.6;1;0.6" dur="3s" repeatCount="indefinite"/> 
+
+        </g> 
+
+        <g transform="translate(16,75)" filter="url(#li-soft)"> 
+
+          <rect width="18" height="12" rx="2" fill="rgba(10,5,25,0.55)" stroke="rgba(167,139,250,0.35)" stroke-width="0.7"/> 
+
+          <line x1="3" y1="4" x2="15" y2="4" stroke="rgba(167,139,250,0.6)" stroke-width="1"/> 
+
+          <line x1="3" y1="7" x2="11" y2="7" stroke="rgba(167,139,250,0.4)" stroke-width="1"/> 
+
+          <line x1="3" y1="10" x2="14" y2="10" stroke="rgba(167,139,250,0.3)" stroke-width="1"/> 
+
+          <animate attributeName="opacity" values="0.5;0.9;0.5" dur="2.5s" repeatCount="indefinite" begin="0.5s"/> 
+
+        </g> 
+
+        <!-- Particles (most and most intense for Liam) --> 
+
+        <circle cx="18" cy="25" r="1.3" fill="rgba(167,139,250,0.7)"><animate attributeName="opacity" values="0.2;1;0.2" dur="2.1s" repeatCount="indefinite"/></circle> 
+
+        <circle cx="182" cy="38" r="1.5" fill="rgba(167,139,250,0.6)"><animate attributeName="opacity" values="0.8;0.1;0.8" dur="3.1s" repeatCount="indefinite"/></circle> 
+
+        <circle cx="12" cy="155" r="1.1" fill="rgba(167,139,250,0.5)"><animate attributeName="opacity" values="0.3;0.9;0.3" dur="1.8s" repeatCount="indefinite"/></circle> 
+
+        <circle cx="188" cy="168" r="1.3" fill="rgba(167,139,250,0.5)"><animate attributeName="opacity" values="0.6;0.1;0.6" dur="2.6s" repeatCount="indefinite"/></circle> 
+
+        <circle cx="185" cy="22" r="1" fill="rgba(167,139,250,0.4)"><animate attributeName="opacity" values="0.1;0.7;0.1" dur="4.2s" repeatCount="indefinite"/></circle> 
+
+        <circle cx="100" cy="8" r="1.2" fill="rgba(167,139,250,0.45)"><animate attributeName="opacity" values="0.4;0.9;0.4" dur="3.5s" repeatCount="indefinite"/></circle> 
+
+        <rect x="0" y="0" width="200" height="1.5" fill="rgba(167,139,250,0.16)" rx="0.5" opacity="0"><animate attributeName="y" values="0;196" dur="3.6s" repeatCount="indefinite"/><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.04;0.96;1" dur="3.6s" repeatCount="indefinite"/></rect> 
+
+        <rect x="8" y="177" width="88" height="14" rx="3.5" fill="rgba(12,5,28,0.78)" stroke="rgba(167,139,250,0.45)" stroke-width="0.8"/> 
+
+        <text x="52" y="187.5" text-anchor="middle" font-family="'Courier New',monospace" font-size="7" fill="rgba(167,139,250,0.92)" font-weight="700" letter-spacing="1.8">AGENTE · #05</text> 
+
+      </svg> 
+
+    </div> 
+
+    <div class="card-body"> 
+
+      <div class="premium-pill">★ Premium · Estrategia</div> 
+
+      <div class="ctop"> 
+
+        <div><div class="cnum">Trabajador #05</div><div class="cname">Liam</div><div class="crole">IA de Estrategia & Operaciones</div></div> 
+
+        <div class="ibox">🧠</div> 
+
+      </div> 
+
+      <p class="desc">Liam es el orquestador. Conecta los objetivos de negocio con la ejecución, sintetizando aportes de todos los demás trabajadores en una estrategia coherente.</p> 
+
+      <div class="slabel">Especialidades</div> 
+
+      <ul class="tasks"> 
+
+        <li><span class="dot"></span>Diseño de OKRs, roadmapping y priorización</li> 
+
+        <li><span class="dot"></span>Inteligencia competitiva y posicionamiento de mercado</li> 
+
+        <li><span class="dot"></span>Orquestación de equipos y automatización de workflows</li> 
+
+        <li><span class="dot"></span>Reportes para directiva y narrativas para inversores</li> 
+
+      </ul> 
+
+      <div class="channels"><span class="ch">Notion</span><span class="ch">Slack</span><span class="ch">Linear</span><span class="ch">Miro</span><span class="ch">Pitch</span></div> 
+
+      <hr class="div"> 
+
+      <div class="footer"><div><div class="fl">Decisiones Validadas</div><div class="fs">2,100+ Aprobadas</div></div><span class="tier-badge">Élite</span></div> 
+
+    </div> 
+
+    <span class="expand-arrow">▾</span> 
+
+  </div> 
+
+ 
+
+</div><!-- /grid2 --> 
+
+ 
+
+<!-- DETAIL PANELS grid2 --> 
+
+<div id="detail-3" class="detail"> 
+
+  <div class="dlabel">Stack Completo de Capacidades · Luke</div> 
+
+  <div class="stats-row"> 
+
+    <div class="stat" style="--ac:var(--gold);--ac-glow:var(--gold-glow)"><div class="stat-val">$4M+</div><div class="stat-lbl">Inversión Gestionada</div></div> 
+
+    <div class="stat" style="--ac:var(--gold);--ac-glow:var(--gold-glow)"><div class="stat-val">4.8×</div><div class="stat-lbl">ROAS Prom.</div></div> 
+
+    <div class="stat" style="--ac:var(--gold);--ac-glow:var(--gold-glow)"><div class="stat-val">220+</div><div class="stat-lbl">Campañas</div></div> 
+
+  </div> 
+
+  <div class="dlabel">Habilidades y Herramientas</div> 
+
+  <div class="chips"><span class="chip">Google Analytics 4</span><span class="chip">Búsqueda Pagada</span><span class="chip">Anuncios Sociales</span><span class="chip">Optimización de Conversión</span><span class="chip">Marketing de Influencers</span><span class="chip">Calendario de Contenidos</span><span class="chip">Copywriting</span><span class="chip">Landing Pages</span><span class="chip">Programas de Referidos</span><span class="chip">Modelado de Atribución</span><span class="chip">Lanzamientos Product Hunt</span><span class="chip">Construcción de Comunidad</span></div> 
+
+</div> 
+
+ 
+
+<div id="detail-4" class="detail"> 
+
+  <div class="dlabel">Stack Completo de Capacidades · Liam</div> 
+
+  <div class="stats-row"> 
+
+    <div class="stat" style="--ac:var(--purple);--ac-glow:var(--purple-glow)"><div class="stat-val">85+</div><div class="stat-lbl">Empresas Atendidas</div></div> 
+
+    <div class="stat" style="--ac:var(--purple);--ac-glow:var(--purple-glow)"><div class="stat-val">3.2×</div><div class="stat-lbl">Crecimiento Prom.</div></div> 
+
+    <div class="stat" style="--ac:var(--purple);--ac-glow:var(--purple-glow)"><div class="stat-val">100%</div><div class="stat-lbl">Retención de Clientes</div></div> 
+
+  </div> 
+
+  <div class="dlabel">Habilidades y Herramientas</div> 
+
+  <div class="chips"><span class="chip">Planificación Estratégica</span><span class="chip">Análisis M&A</span><span class="chip">Modelado Financiero</span><span class="chip">Economía Unitaria</span><span class="chip">Estrategia de Producto</span><span class="chip">Estrategia de Precios</span><span class="chip">Diseño Organizacional</span><span class="chip">Gestión del Cambio</span><span class="chip">Decks para Inversores</span><span class="chip">Due Diligence</span><span class="chip">Automatización de Procesos</span><span class="chip">Integración de IA</span></div> 
+
+</div> 
+
+ 
+
+<p class="hint">Haz clic en cualquier tarjeta para ver las capacidades completas · Nissi Tech © 2025</p> 
+
+ 
+
+</div><!-- /wrap --> 
+
+ 
+
+<script> 
+
+/* ── CANVAS BACKGROUND ── */ 
+
+(function(){ 
+
+  const canvas=document.getElementById('bg-canvas'); 
+
+  const ctx=canvas.getContext('2d'); 
+
+  let W,H,pts; 
+
+  function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;} 
+
+  function init(){ 
+
+    pts=[]; 
+
+    const n=Math.floor(W*H/16000); 
+
+    const colors=['rgba(61,142,245,','rgba(34,201,138,','rgba(167,139,250,','rgba(0,200,255,']; 
+
+    for(let i=0;i<n;i++){ 
+
+      pts.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.22,vy:(Math.random()-.5)*.22,r:Math.random()*1.8+.35,col:colors[Math.floor(Math.random()*colors.length)],op:Math.random()*.25+.04}); 
+
+    } 
+
+  } 
+
+  function draw(){ 
+
+    ctx.clearRect(0,0,W,H); 
+
+    for(let i=0;i<pts.length;i++){ 
+
+      const p=pts[i]; 
+
+      p.x+=p.vx;p.y+=p.vy; 
+
+      if(p.x<0||p.x>W)p.vx*=-1; 
+
+      if(p.y<0||p.y>H)p.vy*=-1; 
+
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2); 
+
+      ctx.fillStyle=p.col+p.op+')';ctx.fill(); 
+
+    } 
+
+    for(let i=0;i<pts.length;i++){ 
+
+      for(let j=i+1;j<pts.length;j++){ 
+
+        const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y; 
+
+        const d=Math.sqrt(dx*dx+dy*dy); 
+
+        if(d<120){ 
+
+          ctx.beginPath();ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y); 
+
+          ctx.strokeStyle='rgba(61,142,245,'+(0.065*(1-d/120))+')';ctx.lineWidth=.5;ctx.stroke(); 
+
+        } 
+
+      } 
+
+    } 
+
+    requestAnimationFrame(draw); 
+
+  } 
+
+  resize();init();draw(); 
+
+  window.addEventListener('resize',()=>{resize();init();}); 
+
+})(); 
+
+ 
+
+/* ── TOGGLE DETAIL ── */ 
+
+const allCards=document.querySelectorAll('.card'); 
+
+const allDetails=document.querySelectorAll('.detail'); 
+
+ 
+
+function toggleDetail(card){ 
+
+  const idx=Array.from(allCards).indexOf(card); 
+
+  const panel=document.getElementById('detail-'+idx); 
+
+  const wasOpen=panel&&panel.classList.contains('open'); 
+
+  allDetails.forEach(d=>d.classList.remove('open')); 
+
+  allCards.forEach(c=>c.classList.remove('active')); 
+
+  if(!wasOpen&&panel){ 
+
+    panel.classList.add('open'); 
+
+    card.classList.add('active'); 
+
+    setTimeout(()=>panel.scrollIntoView({behavior:'smooth',block:'nearest'}),60); 
+
+  } 
+
+} 
+
+</script> 
+
+</body> 
+
+</html> 
