@@ -95,7 +95,7 @@ h1 em{font-style:normal;background:linear-gradient(135deg,var(--blue2),var(--gre
 .gold  .cname{font-size:34px;background:linear-gradient(135deg,var(--gold2),var(--gold),#c8963a);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .purple .cname{font-size:34px;background:linear-gradient(135deg,var(--purple2),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 
-.ibox{width:44px;height:44px;border-radius:13px;border:1px solid var(--border2);background:linear-gradient(135deg,var(--s2),var(--s3));display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;transition:border-color .3s,box-shadow .3s}
+.ibox{width:52px;height:52px;border-radius:14px;border:1px solid var(--border2);background:linear-gradient(145deg,var(--s2),var(--s3));display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;transition:border-color .3s,box-shadow .3s;box-shadow:0 4px 16px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.06)}
 
 .desc{font-size:13px;color:var(--text2);line-height:1.65;margin-bottom:18px}
 
@@ -172,7 +172,38 @@ hr.div{border:none;border-top:1px solid var(--border);margin-bottom:16px}
           <div class="cnum">Front Desk Digital 24/7</div>
           <div class="cname">Sophie</div>
         </div>
-        <div class="ibox">📅</div>
+        <div class="ibox">
+          <svg width="34" height="34" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <radialGradient id="sg1" cx="35%" cy="30%" r="65%">
+                <stop offset="0%" stop-color="#7ab8ff"/>
+                <stop offset="100%" stop-color="#1a5fcc"/>
+              </radialGradient>
+              <radialGradient id="sg2" cx="40%" cy="35%" r="60%">
+                <stop offset="0%" stop-color="#5aa0f5" stop-opacity="0.9"/>
+                <stop offset="100%" stop-color="#0d3a8a" stop-opacity="0.4"/>
+              </radialGradient>
+              <filter id="sf1" x="-30%" y="-30%" width="160%" height="160%">
+                <feGaussianBlur stdDeviation="1.5" result="blur"/>
+                <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+              </filter>
+            </defs>
+            <!-- Glow behind ring -->
+            <circle cx="17" cy="17" r="10" fill="none" stroke="#3d8ef5" stroke-width="5" opacity="0.12" filter="url(#sf1)"/>
+            <!-- Main ring - 3D feel with stroke gradient -->
+            <circle cx="17" cy="17" r="9.5" fill="none" stroke="url(#sg1)" stroke-width="2.2" opacity="0.95"/>
+            <!-- Top highlight arc (light reflection) -->
+            <path d="M10 12 A9.5 9.5 0 0 1 24 10" stroke="white" stroke-width="1.2" stroke-linecap="round" opacity="0.45"/>
+            <!-- Bottom shadow arc -->
+            <path d="M10 22 A9.5 9.5 0 0 0 24 24" stroke="#0a2a6a" stroke-width="1.2" stroke-linecap="round" opacity="0.5"/>
+            <!-- Orbital line across (equator) -->
+            <ellipse cx="17" cy="17" rx="13" ry="4" fill="none" stroke="url(#sg2)" stroke-width="1.3" opacity="0.7"/>
+            <!-- Orbital highlight top -->
+            <path d="M4.5 14.5 Q17 11 29.5 14.5" stroke="white" stroke-width="0.7" stroke-linecap="round" opacity="0.3"/>
+            <!-- Center dot -->
+            <circle cx="17" cy="17" r="2" fill="url(#sg1)" opacity="0.8"/>
+          </svg>
+        </div>
       </div>
       <p class="desc">Tu recepcionista inteligente por WhatsApp. Sophie es la primera línea de tu negocio. Atiende, organiza y confirma. Nunca deja un mensaje sin responder.</p>
       <div class="slabel">Funciones</div>
@@ -202,7 +233,38 @@ hr.div{border:none;border-top:1px solid var(--border);margin-bottom:16px}
           <div class="cnum">Seguimiento y Reactivación</div>
           <div class="cname">Riley</div>
         </div>
-        <div class="ibox">📣</div>
+        <div class="ibox">
+          <svg width="34" height="34" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="rg1" x1="0%" y1="100%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#0f7a4f"/>
+                <stop offset="50%" stop-color="#22c98a"/>
+                <stop offset="100%" stop-color="#7fffd4"/>
+              </linearGradient>
+              <linearGradient id="rg2" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#a0ffe0" stop-opacity="0.9"/>
+                <stop offset="100%" stop-color="#22c98a" stop-opacity="0.2"/>
+              </linearGradient>
+              <filter id="rf1">
+                <feGaussianBlur stdDeviation="2" result="blur"/>
+                <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+              </filter>
+            </defs>
+            <!-- Glow -->
+            <path d="M8 26 Q8 8 26 8" stroke="#22c98a" stroke-width="6" opacity="0.1" fill="none" filter="url(#rf1)"/>
+            <!-- Main curved arrow body -->
+            <path d="M8 26 Q8 8 26 8" stroke="url(#rg1)" stroke-width="3" fill="none" stroke-linecap="round"/>
+            <!-- Highlight on curve (3D top edge) -->
+            <path d="M9 24 Q9 9.5 24.5 9.5" stroke="url(#rg2)" stroke-width="1" fill="none" stroke-linecap="round" opacity="0.7"/>
+            <!-- Arrow head -->
+            <path d="M20 5 L27 8 L23 15" fill="url(#rg1)" stroke="none" opacity="0.95"/>
+            <!-- Arrowhead highlight -->
+            <path d="M21.5 6 L26.5 8.5" stroke="white" stroke-width="0.8" stroke-linecap="round" opacity="0.4"/>
+            <!-- Spark at tip -->
+            <circle cx="26.5" cy="8" r="1.8" fill="#7fffd4" opacity="0.6"/>
+            <circle cx="26.5" cy="8" r="3.5" fill="none" stroke="#22c98a" stroke-width="0.6" opacity="0.25"/>
+          </svg>
+        </div>
       </div>
       <p class="desc">Tu ejecutiva digital de crecimiento. Riley no deja que tus clientes se enfríen. Hace seguimiento, reactiva oportunidades y convierte conversaciones en ventas recurrentes.</p>
       <div class="slabel">Funciones</div>
@@ -232,7 +294,44 @@ hr.div{border:none;border-top:1px solid var(--border);margin-bottom:16px}
           <div class="cnum">Asistente Telefónico Inteligente</div>
           <div class="cname">Liam</div>
         </div>
-        <div class="ibox">📞</div>
+        <div class="ibox">
+          <svg width="34" height="34" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="lg1" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#8ab8ff"/>
+                <stop offset="50%" stop-color="#3d8ef5"/>
+                <stop offset="100%" stop-color="#0d3a8a"/>
+              </linearGradient>
+              <linearGradient id="lg2" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#6aa0f0"/>
+                <stop offset="100%" stop-color="#0a2a6a"/>
+              </linearGradient>
+              <filter id="lf1">
+                <feGaussianBlur stdDeviation="1.8" result="blur"/>
+                <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+              </filter>
+            </defs>
+            <!-- Glow center -->
+            <rect x="15" y="9" width="4" height="16" rx="2" fill="#3d8ef5" opacity="0.15" filter="url(#lf1)"/>
+            <!-- Bars - 3D: face + top edge + side shadow -->
+            <!-- Bar 1 (left outer) -->
+            <rect x="4" y="14" width="3.5" height="6" rx="1.5" fill="url(#lg2)" opacity="0.55"/>
+            <rect x="4" y="14" width="3.5" height="1" rx="1" fill="white" opacity="0.2"/>
+            <!-- Bar 2 -->
+            <rect x="9" y="11" width="3.5" height="12" rx="1.5" fill="url(#lg1)" opacity="0.75"/>
+            <rect x="9" y="11" width="3.5" height="1.2" rx="1" fill="white" opacity="0.28"/>
+            <!-- Bar 3 (center, tallest) -->
+            <rect x="14" y="7" width="4" height="20" rx="2" fill="url(#lg1)"/>
+            <rect x="14" y="7" width="4" height="1.5" rx="1.2" fill="white" opacity="0.38"/>
+            <rect x="17.2" y="7" width="0.8" height="20" rx="0.4" fill="#0d3a8a" opacity="0.3"/>
+            <!-- Bar 4 -->
+            <rect x="20" y="11" width="3.5" height="12" rx="1.5" fill="url(#lg1)" opacity="0.75"/>
+            <rect x="20" y="11" width="3.5" height="1.2" rx="1" fill="white" opacity="0.28"/>
+            <!-- Bar 5 (right outer) -->
+            <rect x="25.5" y="14" width="3.5" height="6" rx="1.5" fill="url(#lg2)" opacity="0.55"/>
+            <rect x="25.5" y="14" width="3.5" height="1" rx="1" fill="white" opacity="0.2"/>
+          </svg>
+        </div>
       </div>
       <p class="desc">Tu operador digital por llamadas. Liam atiende llamadas tradicionales con estructura, claridad y precisión. Organiza la información y mantiene el flujo operativo.</p>
       <div class="slabel">Funciones</div>
@@ -290,7 +389,48 @@ hr.div{border:none;border-top:1px solid var(--border);margin-bottom:16px}
           <div class="cnum">Operations & CRM Manager</div>
           <div class="cname">Noah</div>
         </div>
-        <div class="ibox">👑</div>
+        <div class="ibox">
+          <svg width="34" height="34" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="ng1" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#f5d06a"/>
+                <stop offset="100%" stop-color="#9a6010"/>
+              </linearGradient>
+              <linearGradient id="ng2" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#e8b84b"/>
+                <stop offset="100%" stop-color="#5a3800"/>
+              </linearGradient>
+              <linearGradient id="ng3" x1="100%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#ffeaa0"/>
+                <stop offset="100%" stop-color="#c8810a"/>
+              </linearGradient>
+              <filter id="nf1">
+                <feGaussianBlur stdDeviation="2" result="blur"/>
+                <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+              </filter>
+            </defs>
+            <!-- Glow -->
+            <polygon points="17,5 26,10 26,22 17,27 8,22 8,10" fill="#e8b84b" opacity="0.08" filter="url(#nf1)"/>
+            <!-- Isometric hex - bottom face (dark/shadow) -->
+            <polygon points="17,29 8,24 8,20 17,25 26,20 26,24" fill="url(#ng2)" opacity="0.7"/>
+            <!-- Left face (mid tone) -->
+            <polygon points="8,12 8,24 17,29 17,17" fill="url(#ng2)" opacity="0.85"/>
+            <!-- Right face (lighter) -->
+            <polygon points="26,12 26,24 17,29 17,17" fill="url(#ng1)" opacity="0.95"/>
+            <!-- Top face (brightest) -->
+            <polygon points="17,5 26,10 17,15 8,10" fill="url(#ng3)"/>
+            <!-- Top edge highlight -->
+            <path d="M17 5 L26 10" stroke="white" stroke-width="0.8" opacity="0.5" stroke-linecap="round"/>
+            <path d="M17 5 L8 10" stroke="white" stroke-width="0.5" opacity="0.3" stroke-linecap="round"/>
+            <!-- Center node on top -->
+            <circle cx="17" cy="10" r="2.2" fill="white" opacity="0.85"/>
+            <circle cx="17" cy="10" r="1.1" fill="url(#ng2)" opacity="0.9"/>
+            <!-- Vertex dots on top face -->
+            <circle cx="17" cy="5.5" r="1" fill="#ffd97a" opacity="0.9"/>
+            <circle cx="25.5" cy="10.2" r="1" fill="#ffd97a" opacity="0.7"/>
+            <circle cx="8.5" cy="10.2" r="1" fill="#ffd97a" opacity="0.7"/>
+          </svg>
+        </div>
       </div>
       <p class="desc">Tu equipo digital de atención + seguimiento. Noah combina la capacidad operativa de Sophie con la inteligencia comercial de Riley. No solo atiende: organiza, registra y construye historial.</p>
       <div class="hbody">
@@ -331,7 +471,45 @@ hr.div{border:none;border-top:1px solid var(--border);margin-bottom:16px}
           <div class="cnum">Control Total & Intelligence Hub</div>
           <div class="cname">James</div>
         </div>
-        <div class="ibox">🌐</div>
+        <div class="ibox">
+          <svg width="34" height="34" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <radialGradient id="jg1" cx="38%" cy="32%" r="65%">
+                <stop offset="0%" stop-color="#d4b8ff"/>
+                <stop offset="45%" stop-color="#8b5cf6"/>
+                <stop offset="100%" stop-color="#2d0a6b"/>
+              </radialGradient>
+              <radialGradient id="jg2" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#a78bfa" stop-opacity="0.3"/>
+                <stop offset="100%" stop-color="#4c1d95" stop-opacity="0"/>
+              </radialGradient>
+              <linearGradient id="jg3" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#c4b5fd"/>
+                <stop offset="100%" stop-color="#4c1d95"/>
+              </linearGradient>
+              <filter id="jf1">
+                <feGaussianBlur stdDeviation="2.5" result="blur"/>
+                <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+              </filter>
+            </defs>
+            <!-- Outer glow -->
+            <circle cx="17" cy="17" r="12" fill="url(#jg2)" filter="url(#jf1)"/>
+            <!-- Sphere body -->
+            <circle cx="17" cy="17" r="10" fill="url(#jg1)"/>
+            <!-- Specular highlight (3D feel) -->
+            <ellipse cx="13.5" cy="12" rx="4" ry="2.5" fill="white" opacity="0.18"/>
+            <ellipse cx="12.5" cy="11.5" rx="2" ry="1.2" fill="white" opacity="0.22"/>
+            <!-- Equatorial ring (front) -->
+            <ellipse cx="17" cy="17" rx="13" ry="4.5" fill="none" stroke="url(#jg3)" stroke-width="1.8" opacity="0.8"/>
+            <!-- Ring highlight top edge -->
+            <path d="M4.5 14.5 Q17 10.5 29.5 14.5" stroke="white" stroke-width="0.8" stroke-linecap="round" opacity="0.35"/>
+            <!-- Second ring tilted -->
+            <ellipse cx="17" cy="17" rx="4.5" ry="13" fill="none" stroke="#a78bfa" stroke-width="1.2" opacity="0.45"/>
+            <!-- Ring dot accent -->
+            <circle cx="29.8" cy="17" r="1.5" fill="#c4b5fd" opacity="0.85"/>
+            <circle cx="4.2" cy="17" r="1.2" fill="#7c3aed" opacity="0.6"/>
+          </svg>
+        </div>
       </div>
       <p class="desc">Tu centro de operaciones digitales. James es tu equipo completo: integra atención, seguimiento, llamadas, CRM y reportes internos. Es tu back office digital.</p>
       <div class="hbody">
