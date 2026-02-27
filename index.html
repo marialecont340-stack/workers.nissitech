@@ -4,553 +4,754 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Nissi Tech — Workers</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #0a0a0f;
-    --surface: #111118;
-    --border: #1e1e2e;
-    --text: #e8e8f0;
-    --muted: #6b6b85;
-    --w1: #00d4aa;
-    --w2: #4f8ef7;
-    --w3: #f7a24f;
-    --w4: #c084fc;
-    --w4-glow: rgba(192, 132, 252, 0.15);
-  }
+:root {
+  --bg: #04070f;
+  --s1: #080e1a;
+  --s2: #0c1422;
+  --s3: #101c2e;
+  --border: #162033;
+  --border2: #1e2f47;
+  --blue: #3d8ef5;
+  --blue2: #5aa3ff;
+  --blue-glow: rgba(61,142,245,0.18);
+  --blue-glow2: rgba(61,142,245,0.06);
+  --green: #22c98a;
+  --green2: #30e09a;
+  --green-glow: rgba(34,201,138,0.15);
+  --gold: #e8b84b;
+  --gold2: #f5d080;
+  --gold-glow: rgba(232,184,75,0.12);
+  --text: #dde8f8;
+  --text2: #7a94b3;
+  --text3: #3d5570;
+  --font: 'Plus Jakarta Sans', sans-serif;
+}
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    min-height: 100vh;
-    padding: 48px 24px;
-    overflow-x: hidden;
-  }
+html { scroll-behavior: smooth; }
 
-  /* Ambient background */
-  body::before {
-    content: '';
-    position: fixed;
-    top: -200px; left: 50%;
-    transform: translateX(-50%);
-    width: 800px; height: 600px;
-    background: radial-gradient(ellipse, rgba(79,142,247,0.06) 0%, transparent 70%);
-    pointer-events: none;
-    z-index: 0;
-  }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  min-height: 100vh;
+  padding: 70px 24px 120px;
+  overflow-x: hidden;
+  position: relative;
+}
 
-  .container {
-    max-width: 960px;
-    margin: 0 auto;
-    position: relative;
-    z-index: 1;
-  }
+/* ── CANVAS BG ── */
+#bg-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.55;
+}
 
-  header {
-    text-align: center;
-    margin-bottom: 64px;
-    animation: fadeUp 0.7s ease both;
-  }
+/* ── AMBIENT GLOWS ── */
+.glow-orb {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(120px);
+  pointer-events: none;
+  z-index: 0;
+}
+.glow-orb.a { width: 600px; height: 600px; top: -150px; right: -100px; background: radial-gradient(circle, rgba(61,142,245,0.09) 0%, transparent 70%); }
+.glow-orb.b { width: 500px; height: 500px; bottom: 100px; left: -120px; background: radial-gradient(circle, rgba(34,201,138,0.07) 0%, transparent 70%); }
+.glow-orb.c { width: 400px; height: 400px; top: 50%; left: 50%; transform: translate(-50%,-50%); background: radial-gradient(circle, rgba(232,184,75,0.03) 0%, transparent 70%); }
 
-  .brand {
-    font-family: 'Syne', sans-serif;
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 12px;
-  }
+.container {
+  max-width: 1020px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
 
-  h1 {
-    font-family: 'Syne', sans-serif;
-    font-size: clamp(36px, 6vw, 64px);
-    font-weight: 800;
-    line-height: 1.05;
-    letter-spacing: -0.02em;
-    margin-bottom: 16px;
-  }
+/* ── HEADER ── */
+header {
+  text-align: center;
+  margin-bottom: 88px;
+}
 
-  h1 span {
-    background: linear-gradient(135deg, #c084fc, #4f8ef7);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
+.brand-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--border2);
+  border-radius: 100px;
+  padding: 7px 20px;
+  margin-bottom: 36px;
+  background: linear-gradient(135deg, var(--s2), var(--s1));
+  box-shadow: 0 0 0 1px rgba(61,142,245,0.08), inset 0 1px 0 rgba(255,255,255,0.04);
+  animation: fadeUp 0.8s ease both;
+}
 
-  .subtitle {
-    color: var(--muted);
-    font-size: 16px;
-    font-weight: 300;
-    max-width: 480px;
-    margin: 0 auto;
-    line-height: 1.6;
-  }
+.brand-dot {
+  width: 7px; height: 7px;
+  background: var(--green);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--green), 0 0 16px rgba(34,201,138,0.4);
+  animation: pulse 2.5s ease-in-out infinite;
+}
 
-  /* Workers grid */
-  .grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    margin-bottom: 32px;
-  }
+@keyframes pulse {
+  0%,100% { box-shadow: 0 0 6px var(--green), 0 0 12px rgba(34,201,138,0.3); }
+  50%      { box-shadow: 0 0 12px var(--green), 0 0 24px rgba(34,201,138,0.6); }
+}
 
-  @media (max-width: 640px) {
-    .grid { grid-template-columns: 1fr; }
-  }
+.brand-text {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text3);
+}
 
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 28px;
-    cursor: pointer;
-    transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
-    animation: fadeUp 0.7s ease both;
-    position: relative;
-    overflow: hidden;
-  }
+h1 {
+  font-size: clamp(46px, 7.5vw, 84px);
+  font-weight: 800;
+  line-height: 1.0;
+  letter-spacing: -0.025em;
+  color: var(--text);
+  margin-bottom: 22px;
+  animation: fadeUp 0.8s ease 0.1s both;
+}
 
-  .card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    border-radius: 16px 16px 0 0;
-    background: var(--accent);
-    opacity: 0.6;
-    transition: opacity 0.25s;
-  }
+h1 em {
+  font-style: italic;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--blue2) 0%, var(--green2) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
 
-  .card:hover {
-    transform: translateY(-4px);
-    border-color: var(--accent);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.4), 0 0 0 1px var(--accent);
-  }
+.subtitle {
+  font-size: 15.5px;
+  color: var(--text2);
+  font-weight: 400;
+  max-width: 500px;
+  margin: 0 auto;
+  line-height: 1.8;
+  animation: fadeUp 0.8s ease 0.2s both;
+}
 
-  .card:hover::before { opacity: 1; }
+/* ── GRID ── */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 20px;
+}
 
-  .card.w1 { --accent: var(--w1); animation-delay: 0.1s; }
-  .card.w2 { --accent: var(--w2); animation-delay: 0.2s; }
-  .card.w3 { --accent: var(--w3); animation-delay: 0.3s; }
-  .card.w4 {
-    --accent: var(--w4);
-    animation-delay: 0.4s;
-    grid-column: 1 / -1;
-    background: linear-gradient(135deg, #111118, #16101f);
-    border-color: rgba(192,132,252,0.3);
-  }
+@media (max-width: 660px) { .grid { grid-template-columns: 1fr; } }
 
-  .card-header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    margin-bottom: 20px;
-  }
+/* ── CARD BASE ── */
+.card {
+  background: var(--s1);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 32px 28px 26px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.35s cubic-bezier(.22,.68,0,1.2), box-shadow 0.35s ease, border-color 0.35s ease;
+  animation: fadeUp 0.7s ease both;
+}
 
-  .worker-id {
-    font-family: 'Syne', sans-serif;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.15em;
-    color: var(--accent);
-    text-transform: uppercase;
-    margin-bottom: 6px;
-  }
+/* Top edge glow */
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 10%; right: 10%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent-a), var(--accent-b, var(--accent-a)), transparent);
+  opacity: 0.3;
+  transition: opacity 0.35s, left 0.35s, right 0.35s;
+}
 
-  .worker-name {
-    font-family: 'Syne', sans-serif;
-    font-size: 22px;
-    font-weight: 800;
-    line-height: 1.1;
-  }
+/* Corner accent */
+.card::after {
+  content: '';
+  position: absolute;
+  top: -1px; right: -1px;
+  width: 60px; height: 60px;
+  background: radial-gradient(circle at top right, var(--accent-glow, transparent) 0%, transparent 70%);
+  border-radius: 0 24px 0 0;
+  opacity: 0;
+  transition: opacity 0.35s;
+}
 
-  .worker-emoji {
-    font-size: 32px;
-    line-height: 1;
-  }
+.card:hover { transform: translateY(-6px) scale(1.005); border-color: var(--accent-a); box-shadow: 0 0 0 1px var(--accent-a), 0 30px 60px rgba(0,0,0,0.6), 0 0 40px var(--accent-glow, transparent); }
+.card:hover::before { opacity: 1; left: 0; right: 0; }
+.card:hover::after { opacity: 1; }
 
-  .worker-role {
-    font-size: 13px;
-    color: var(--muted);
-    font-weight: 300;
-    margin-bottom: 20px;
-    font-style: italic;
-  }
+.card.c1 { --accent-a: var(--blue); --accent-b: var(--blue2); --accent-glow: var(--blue-glow); animation-delay: 0.1s; }
+.card.c2 { --accent-a: var(--green); --accent-b: var(--green2); --accent-glow: var(--green-glow); animation-delay: 0.2s; }
+.card.c3 { --accent-a: var(--blue); --accent-b: var(--blue2); --accent-glow: var(--blue-glow); animation-delay: 0.3s; }
 
-  .tasks {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-bottom: 20px;
-  }
+/* ── SALOMÓN CARD ── */
+.card.c4 {
+  --accent-a: var(--gold);
+  --accent-b: var(--gold2);
+  --accent-glow: var(--gold-glow);
+  animation-delay: 0.4s;
+  grid-column: 1 / -1;
+  background: linear-gradient(145deg, #08101e 0%, #0b1528 40%, #060f1a 100%);
+  border-color: rgba(232,184,75,0.2);
+  padding: 36px 32px 30px;
+}
 
-  .tasks li {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    font-size: 13.5px;
-    color: #b0b0c8;
-    line-height: 1.4;
-  }
+.card.c4:hover {
+  box-shadow: 0 0 0 1px rgba(232,184,75,0.5), 0 32px 64px rgba(0,0,0,0.7), 0 0 80px rgba(232,184,75,0.08);
+}
 
-  .tasks li::before {
-    content: '';
-    width: 5px;
-    height: 5px;
-    min-width: 5px;
-    background: var(--accent);
-    border-radius: 50%;
-    margin-top: 6px;
-    opacity: 0.8;
-  }
+/* Gold shimmer sweep on Salomón */
+.card.c4 .shimmer {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 30%, rgba(232,184,75,0.03) 50%, transparent 70%);
+  background-size: 200% 100%;
+  animation: shimmer 4s ease-in-out infinite;
+}
 
-  .verticals {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-bottom: 20px;
-  }
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
 
-  .tag {
-    font-size: 11px;
-    padding: 3px 10px;
-    border-radius: 20px;
-    border: 1px solid rgba(255,255,255,0.08);
-    color: var(--muted);
-    background: rgba(255,255,255,0.03);
-    font-weight: 500;
-  }
+/* ── CARD INNER ── */
+.card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 18px;
+  gap: 12px;
+}
 
-  .price-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding-top: 16px;
-    border-top: 1px solid var(--border);
-  }
+.worker-role-title {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 6px;
+}
 
-  .price-label {
-    font-size: 11px;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-  }
+.worker-name {
+  font-size: 32px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
 
-  .price-value {
-    font-family: 'Syne', sans-serif;
-    font-size: 20px;
-    font-weight: 800;
-    color: var(--accent);
-  }
+.card.c4 .worker-name {
+  font-size: 36px;
+  background: linear-gradient(135deg, var(--gold2) 0%, var(--gold) 60%, #c8963a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
 
-  .price-note {
-    font-size: 11px;
-    color: var(--muted);
-    font-weight: 300;
-  }
+.icon-box {
+  width: 48px; height: 48px;
+  border-radius: 14px;
+  border: 1px solid var(--border2);
+  background: linear-gradient(135deg, var(--s2), var(--s3));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
 
-  /* W4 special layout */
-  .card.w4 .card-body {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 24px;
-    align-items: start;
-  }
+.card:hover .icon-box {
+  border-color: var(--accent-a);
+  box-shadow: 0 0 12px var(--accent-glow, transparent), inset 0 1px 0 rgba(255,255,255,0.05);
+}
 
-  @media (max-width: 640px) {
-    .card.w4 .card-body { grid-template-columns: 1fr; }
-  }
+.worker-desc {
+  font-size: 13.5px;
+  color: var(--text2);
+  font-weight: 400;
+  line-height: 1.65;
+  margin-bottom: 24px;
+}
 
-  .w4-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--w4);
-    background: rgba(192,132,252,0.08);
-    border: 1px solid rgba(192,132,252,0.2);
-    padding: 4px 12px;
-    border-radius: 20px;
-    margin-bottom: 10px;
-  }
+.section-label {
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 12px;
+}
 
-  /* Detail panel */
-  .detail-panel {
-    display: none;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 32px;
-    margin-top: -8px;
-    margin-bottom: 20px;
-    animation: fadeDown 0.3s ease both;
-  }
+.tasks {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin-bottom: 22px;
+}
 
-  .detail-panel.open { display: block; }
+.tasks li {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  font-size: 13.5px;
+  color: var(--text2);
+  line-height: 1.5;
+  font-weight: 400;
+}
 
-  .detail-title {
-    font-family: 'Syne', sans-serif;
-    font-size: 14px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: var(--muted);
-    margin-bottom: 12px;
-  }
+.tasks li .dot {
+  width: 5px; height: 5px;
+  min-width: 5px;
+  border-radius: 50%;
+  background: var(--accent-a);
+  margin-top: 8px;
+  box-shadow: 0 0 6px var(--accent-glow, transparent);
+  flex-shrink: 0;
+}
 
-  .tool-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-bottom: 22px;
+}
 
-  .tool-chip {
-    font-size: 12px;
-    padding: 5px 12px;
-    border-radius: 8px;
-    background: rgba(255,255,255,0.04);
-    border: 1px solid var(--border);
-    color: var(--text);
-  }
+.tag {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 11px;
+  border-radius: 20px;
+  border: 1px solid var(--border2);
+  color: var(--text3);
+  background: var(--s2);
+  letter-spacing: 0.02em;
+  transition: border-color 0.2s, color 0.2s;
+}
 
-  /* Leyenda */
-  .legend {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    font-size: 12px;
-    color: var(--muted);
-    margin-top: 16px;
-    animation: fadeUp 0.7s ease 0.5s both;
-  }
+.card:hover .tag { border-color: rgba(255,255,255,0.08); color: var(--text2); }
 
-  .legend span { cursor: default; }
+.divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin-bottom: 18px;
+}
 
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(24px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
+.card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
 
-  @keyframes fadeDown {
-    from { opacity: 0; transform: translateY(-8px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
+.footer-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text3);
+  letter-spacing: 0.05em;
+  margin-bottom: 2px;
+}
+
+.footer-sub {
+  font-size: 11.5px;
+  color: var(--text3);
+  font-weight: 300;
+}
+
+.tier {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 16px;
+  border-radius: 20px;
+  letter-spacing: 0.06em;
+  border: 1px solid var(--accent-a);
+  color: var(--accent-a);
+  background: rgba(0,0,0,0.3);
+  text-transform: uppercase;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+
+.card:hover .tier {
+  background: var(--accent-glow, transparent);
+  box-shadow: 0 0 12px var(--accent-glow, transparent);
+}
+
+/* ── SALOMÓN BODY ── */
+.premium-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold);
+  background: rgba(232,184,75,0.08);
+  border: 1px solid rgba(232,184,75,0.25);
+  padding: 5px 14px;
+  border-radius: 20px;
+  margin-bottom: 18px;
+  box-shadow: 0 0 16px rgba(232,184,75,0.06);
+}
+
+.sol-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+}
+
+@media (max-width: 560px) { .sol-body { grid-template-columns: 1fr; } }
+
+.card.c4 .verse-block {
+  margin: 20px 0;
+  padding: 16px 20px;
+  border-left: 2px solid rgba(232,184,75,0.35);
+  background: rgba(232,184,75,0.04);
+  border-radius: 0 10px 10px 0;
+}
+
+.card.c4 .verse-text {
+  font-size: 13px;
+  font-style: italic;
+  color: rgba(232,184,75,0.75);
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+/* ── DETAIL PANEL ── */
+.detail {
+  display: none;
+  background: var(--s1);
+  border: 1px solid var(--border2);
+  border-radius: 18px;
+  padding: 28px 32px;
+  margin-bottom: 16px;
+  animation: fadeDown 0.3s ease both;
+}
+
+.detail.open { display: block; }
+
+.detail-label {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 16px;
+}
+
+.chips { display: flex; flex-wrap: wrap; gap: 9px; }
+
+.chip {
+  font-size: 12.5px;
+  font-weight: 500;
+  padding: 6px 15px;
+  border-radius: 10px;
+  background: var(--s2);
+  border: 1px solid var(--border2);
+  color: var(--text2);
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+  cursor: default;
+}
+
+.chip:hover { background: var(--s3); border-color: var(--blue); color: var(--text); }
+
+/* ── HINT ── */
+.hint {
+  text-align: center;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text3);
+  margin-top: 12px;
+  letter-spacing: 0.05em;
+  animation: fadeUp 0.7s ease 0.6s both;
+}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
 </style>
 </head>
 <body>
+
+<canvas id="bg-canvas"></canvas>
+<div class="glow-orb a"></div>
+<div class="glow-orb b"></div>
+<div class="glow-orb c"></div>
+
 <div class="container">
 
   <header>
-    <p class="brand">Nissi Tech — Catálogo de Workers</p>
-    <h1>Tu equipo de IA<br><span>trabaja 24/7</span></h1>
-    <p class="subtitle">4 workers diseñados para los negocios locales que más los necesitan. Haz clic en cada card para ver herramientas sugeridas.</p>
+    <div class="brand-pill">
+      <div class="brand-dot"></div>
+      <span class="brand-text">Nissi Tech — Empleados de IA</span>
+    </div>
+    <h1>Tu primer equipo<br><em>que nunca duerme</em></h1>
+    <p class="subtitle">Contrata empleados de IA diseñados para negocios reales. Cada uno asume un rol específico para que puedas dejar de hacer malabarismos y empezar a delegar.</p>
   </header>
 
-  <div class="grid" id="grid">
+  <div class="grid">
 
-    <!-- Worker 1 -->
-    <div class="card w1" onclick="toggle('d1')">
-      <div class="card-header">
+    <!-- GABRIEL -->
+    <div class="card c1" onclick="toggle('d1')">
+      <div class="card-top">
         <div>
-          <div class="worker-id">Worker 01</div>
-          <div class="worker-name">Nova</div>
+          <div class="worker-role-title">Especialista en Atención al Cliente</div>
+          <div class="worker-name">Gabriel</div>
         </div>
-        <div class="worker-emoji">📅</div>
+        <div class="icon-box">📩</div>
       </div>
-      <p class="worker-role">El Recepcionista Inteligente</p>
+      <p class="worker-desc">Tu primer empleado siempre disponible. Gabriel responde, agenda y atiende a cada cliente como si estuvieras tú — sin que estés tú.</p>
+      <div class="section-label">Qué hace</div>
       <ul class="tasks">
-        <li>Responde WhatsApp / Instagram automáticamente</li>
-        <li>Agenda, modifica y cancela citas 24/7</li>
-        <li>Envía recordatorios automáticos al cliente</li>
-        <li>Responde preguntas frecuentes del negocio</li>
+        <li><span class="dot"></span>Responde mensajes automáticamente — texto, audio e imagen</li>
+        <li><span class="dot"></span>Agenda y confirma citas directamente por chat</li>
+        <li><span class="dot"></span>Envía recordatorios automáticos antes de cada cita</li>
+        <li><span class="dot"></span>Resuelve las preguntas frecuentes del negocio al instante</li>
       </ul>
-      <div class="verticals">
+      <div class="tags">
         <span class="tag">Peluquerías</span>
         <span class="tag">Spas</span>
         <span class="tag">Barberías</span>
         <span class="tag">Odontologías</span>
         <span class="tag">Ópticas</span>
       </div>
-      <div class="price-row">
+      <hr class="divider">
+      <div class="card-footer">
         <div>
-          <div class="price-label">Desde</div>
-          <div class="price-note">mensual por negocio</div>
+          <div class="footer-label">Nivel de entrada</div>
+          <div class="footer-sub">ideal para comenzar</div>
         </div>
-        <div class="price-value">Plan Base</div>
+        <span class="tier">Plan Base</span>
       </div>
     </div>
 
-    <!-- Worker 2 -->
-    <div class="card w2" onclick="toggle('d2')">
-      <div class="card-header">
+    <!-- DAVID -->
+    <div class="card c2" onclick="toggle('d2')">
+      <div class="card-top">
         <div>
-          <div class="worker-id">Worker 02</div>
-          <div class="worker-name">Kira</div>
+          <div class="worker-role-title">Gerente de Operaciones</div>
+          <div class="worker-name">David</div>
         </div>
-        <div class="worker-emoji">📣</div>
+        <div class="icon-box">🗂️</div>
       </div>
-      <p class="worker-role">La Gestora de Reputación & Marketing</p>
+      <p class="worker-desc">El orden que tu negocio necesitaba. David registra, organiza y notifica para que nada se pierda, ningún cliente quede sin respuesta.</p>
+      <div class="section-label">Qué hace</div>
       <ul class="tasks">
-        <li>Solicita y gestiona reseñas post-servicio</li>
-        <li>Genera contenido para redes (textos, ideas)</li>
-        <li>Envía promos y campañas segmentadas</li>
-        <li>Reporta métricas básicas de engagement</li>
+        <li><span class="dot"></span>Registra cada cliente nuevo y su historial automáticamente</li>
+        <li><span class="dot"></span>Lleva el control de cada caso: quién llegó, qué necesita, cuál es su estado</li>
+        <li><span class="dot"></span>Notifica al cliente en tiempo real: recibido, en proceso, listo para recoger</li>
+        <li><span class="dot"></span>Lee documentos y centraliza la información en tablas organizadas</li>
       </ul>
-      <div class="verticals">
-        <span class="tag">Spas</span>
-        <span class="tag">Barberías</span>
-        <span class="tag">Ropa</span>
-        <span class="tag">Naturistas</span>
-      </div>
-      <div class="price-row">
-        <div>
-          <div class="price-label">Desde</div>
-          <div class="price-note">mensual por negocio</div>
-        </div>
-        <div class="price-value">Plan Medio</div>
-      </div>
-    </div>
-
-    <!-- Worker 3 -->
-    <div class="card w3" onclick="toggle('d3')">
-      <div class="card-header">
-        <div>
-          <div class="worker-id">Worker 03</div>
-          <div class="worker-name">Orion</div>
-        </div>
-        <div class="worker-emoji">🗂️</div>
-      </div>
-      <p class="worker-role">El Operador de Base de Datos</p>
-      <ul class="tasks">
-        <li>Registra clientes, historial y preferencias</li>
-        <li>Centraliza inventario, pedidos o reparaciones</li>
-        <li>Notifica estados: listo, en proceso, entregado</li>
-        <li>Genera reportes automáticos semanales</li>
-      </ul>
-      <div class="verticals">
+      <div class="tags">
         <span class="tag">Taller Reparaciones</span>
         <span class="tag">Ropa</span>
         <span class="tag">Naturistas</span>
         <span class="tag">Clínicas</span>
       </div>
-      <div class="price-row">
+      <hr class="divider">
+      <div class="card-footer">
         <div>
-          <div class="price-label">Desde</div>
-          <div class="price-note">mensual por negocio</div>
+          <div class="footer-label">Nivel operativo</div>
+          <div class="footer-sub">para negocios con volumen</div>
         </div>
-        <div class="price-value">Plan Medio</div>
+        <span class="tier">Plan Operativo</span>
       </div>
     </div>
 
-    <!-- Worker 4 — FULL -->
-    <div class="card w4" onclick="toggle('d4')">
-      <div class="w4-badge">⭐ Worker Premium</div>
-      <div class="card-header">
+    <!-- DANIEL -->
+    <div class="card c3" onclick="toggle('d3')">
+      <div class="card-top">
         <div>
-          <div class="worker-id">Worker 04</div>
-          <div class="worker-name">Axis — El Equipo Completo</div>
+          <div class="worker-role-title">Gerente de Marketing & Fidelización</div>
+          <div class="worker-name">Daniel</div>
         </div>
-        <div class="worker-emoji">🤖</div>
+        <div class="icon-box">📣</div>
       </div>
-      <p class="worker-role">Nova + Kira + Orion en uno solo. Para negocios que quieren automatización total.</p>
-      <div class="card-body">
-        <ul class="tasks">
-          <li>Todo lo que hace Nova (citas & atención)</li>
-          <li>Todo lo que hace Kira (marketing & reseñas)</li>
-          <li>Todo lo que hace Orion (datos & reportes)</li>
-        </ul>
-        <ul class="tasks">
-          <li>Panel de control unificado para el dueño</li>
-          <li>Integración con pagos (links, cobros)</li>
-          <li>Onboarding y soporte prioritario Nissi Tech</li>
-        </ul>
+      <p class="worker-desc">El que mantiene tu negocio en la mente de tus clientes. Daniel construye reputación, envía promos y trae de vuelta a quienes ya te conocen.</p>
+      <div class="section-label">Qué hace</div>
+      <ul class="tasks">
+        <li><span class="dot"></span>Envía mensaje post-servicio solicitando reseña al cliente</li>
+        <li><span class="dot"></span>Distribuye promociones y novedades por WhatsApp</li>
+        <li><span class="dot"></span>Reactiva clientes inactivos con mensajes personalizados</li>
+        <li><span class="dot"></span>Notifica por voz o texto usando llamadas con IA</li>
+      </ul>
+      <div class="tags">
+        <span class="tag">Spas</span>
+        <span class="tag">Barberías</span>
+        <span class="tag">Peluquerías</span>
+        <span class="tag">Ropa</span>
       </div>
-      <div class="price-row" style="margin-top:16px;">
+      <hr class="divider">
+      <div class="card-footer">
         <div>
-          <div class="price-label">Premium — ahorra vs contratar los 3</div>
-          <div class="price-note">para negocios con alto tráfico</div>
+          <div class="footer-label">Nivel fidelización</div>
+          <div class="footer-sub">retención de clientes</div>
         </div>
-        <div class="price-value">Plan Full</div>
+        <span class="tier">Plan Plus</span>
       </div>
     </div>
 
-  </div><!-- /grid -->
+    <!-- SALOMÓN -->
+    <div class="card c4" onclick="toggle('d4')">
+      <div class="shimmer"></div>
+      <div class="premium-pill">★&nbsp;&nbsp;Equipo Completo — Plan Salomón</div>
+      <div class="card-top">
+        <div>
+          <div class="worker-role-title">Director de Operaciones Digitales</div>
+          <div class="worker-name">Salomón</div>
+        </div>
+        <div class="icon-box">👑</div>
+      </div>
 
-  <!-- Detail panels -->
-  <div class="detail-panel" id="d1">
-    <div class="detail-title">🔧 Herramientas sugeridas para Nova</div>
-    <div class="tool-grid">
-      <span class="tool-chip">n8n (orquestación)</span>
-      <span class="tool-chip">WhatsApp Business API</span>
-      <span class="tool-chip">Calendly / Cal.com</span>
-      <span class="tool-chip">Google Calendar</span>
-      <span class="tool-chip">Twilio (SMS)</span>
-      <span class="tool-chip">Airtable (base de citas)</span>
-      <span class="tool-chip">ManyChat (IG)</span>
+      <div class="verse-block">
+        <p class="verse-text">"Más valen dos que uno, porque obtienen más fruto de su esfuerzo. Si caen, el uno levanta al otro." — Eclesiastés 4:9-10</p>
+      </div>
+
+      <p class="worker-desc">Gabriel, David y Daniel trabajando juntos bajo un solo sistema. El equipo completo para el negocio que quiere crecer — sin contratar más personal.</p>
+
+      <div class="sol-body">
+        <div>
+          <div class="section-label">Lo que incluye</div>
+          <ul class="tasks">
+            <li><span class="dot"></span>Atención y agendamiento 24/7 — Gabriel</li>
+            <li><span class="dot"></span>Registro, control y notificaciones — David</li>
+            <li><span class="dot"></span>Reseñas, promos y reactivación — Daniel</li>
+          </ul>
+        </div>
+        <div>
+          <div class="section-label">Exclusivo de Salomón</div>
+          <ul class="tasks">
+            <li><span class="dot"></span>IA que habla, escucha y entiende por llamada telefónica</li>
+            <li><span class="dot"></span>Panel centralizado para el dueño del negocio</li>
+            <li><span class="dot"></span>Onboarding y soporte prioritario Nissi Tech</li>
+          </ul>
+        </div>
+      </div>
+
+      <hr class="divider" style="margin-top:22px;">
+      <div class="card-footer">
+        <div>
+          <div class="footer-label">Tu equipo digital completo</div>
+          <div class="footer-sub">sin sumar personal adicional</div>
+        </div>
+        <span class="tier">Plan Salomón</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- PANELS -->
+  <div class="detail" id="d1">
+    <div class="detail-label">🔧 Stack tecnológico — Gabriel</div>
+    <div class="chips">
+      <span class="chip">n8n</span><span class="chip">WhatsApp Business API</span><span class="chip">ManyChat (Instagram)</span><span class="chip">Cal.com / Google Calendar</span><span class="chip">Whisper AI (audios)</span><span class="chip">Claude / GPT-4</span><span class="chip">Twilio (SMS)</span>
     </div>
   </div>
 
-  <div class="detail-panel" id="d2">
-    <div class="detail-title">🔧 Herramientas sugeridas para Kira</div>
-    <div class="tool-grid">
-      <span class="tool-chip">n8n</span>
-      <span class="tool-chip">Claude / GPT-4 (copy)</span>
-      <span class="tool-chip">Google Reviews API</span>
-      <span class="tool-chip">Mailchimp / Brevo</span>
-      <span class="tool-chip">Instagram Graph API</span>
-      <span class="tool-chip">Notion (calendario contenido)</span>
+  <div class="detail" id="d2">
+    <div class="detail-label">🔧 Stack tecnológico — David</div>
+    <div class="chips">
+      <span class="chip">n8n</span><span class="chip">Google Sheets / Airtable</span><span class="chip">WhatsApp (notificaciones)</span><span class="chip">Telegram Bot</span><span class="chip">PDF / Doc Reader</span><span class="chip">Google Drive</span>
     </div>
   </div>
 
-  <div class="detail-panel" id="d3">
-    <div class="detail-title">🔧 Herramientas sugeridas para Orion</div>
-    <div class="tool-grid">
-      <span class="tool-chip">n8n</span>
-      <span class="tool-chip">Airtable / Notion DB</span>
-      <span class="tool-chip">Google Sheets</span>
-      <span class="tool-chip">WhatsApp (notificaciones)</span>
-      <span class="tool-chip">Telegram Bot</span>
-      <span class="tool-chip">Looker Studio (reportes)</span>
+  <div class="detail" id="d3">
+    <div class="detail-label">🔧 Stack tecnológico — Daniel</div>
+    <div class="chips">
+      <span class="chip">n8n</span><span class="chip">WhatsApp API</span><span class="chip">ElevenLabs / Vapi (voz IA)</span><span class="chip">Google Reviews</span><span class="chip">Brevo / Mailchimp</span><span class="chip">Segmentación por etiquetas</span>
     </div>
   </div>
 
-  <div class="detail-panel" id="d4">
-    <div class="detail-title">🔧 Stack completo de Axis</div>
-    <div class="tool-grid">
-      <span class="tool-chip">n8n (núcleo)</span>
-      <span class="tool-chip">WhatsApp Business API</span>
-      <span class="tool-chip">Cal.com</span>
-      <span class="tool-chip">Airtable</span>
-      <span class="tool-chip">Claude AI</span>
-      <span class="tool-chip">Brevo</span>
-      <span class="tool-chip">Looker Studio</span>
-      <span class="tool-chip">Stripe / Wompi</span>
-      <span class="tool-chip">Instagram API</span>
-      <span class="tool-chip">Telegram Bot</span>
-      <span class="tool-chip">Google Calendar</span>
+  <div class="detail" id="d4">
+    <div class="detail-label">🔧 Stack completo — Salomón</div>
+    <div class="chips">
+      <span class="chip">n8n (núcleo)</span><span class="chip">WhatsApp Business API</span><span class="chip">Cal.com</span><span class="chip">Airtable / Sheets</span><span class="chip">Whisper AI</span><span class="chip">ElevenLabs / Vapi</span><span class="chip">Claude AI</span><span class="chip">Brevo</span><span class="chip">Google Drive</span><span class="chip">Telegram Bot</span><span class="chip">Google Calendar</span><span class="chip">ManyChat</span>
     </div>
   </div>
 
-  <p class="legend"><span>💡 Haz clic en cada card para ver el stack tecnológico sugerido</span></p>
+  <p class="hint">↑ Clic en cada worker para ver el stack tecnológico</p>
 
 </div>
 
 <script>
-  function toggle(id) {
-    const panels = document.querySelectorAll('.detail-panel');
-    panels.forEach(p => {
-      if (p.id !== id) p.classList.remove('open');
-    });
-    document.getElementById(id).classList.toggle('open');
+// ── PARTICLE CANVAS ──
+const canvas = document.getElementById('bg-canvas');
+const ctx = canvas.getContext('2d');
+let W, H, particles = [];
+
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+
+function Particle() {
+  this.x = Math.random() * W;
+  this.y = Math.random() * H;
+  this.size = Math.random() * 1.2 + 0.3;
+  this.speedX = (Math.random() - 0.5) * 0.2;
+  this.speedY = (Math.random() - 0.5) * 0.15;
+  const colors = ['rgba(61,142,245,', 'rgba(34,201,138,', 'rgba(232,184,75,'];
+  this.color = colors[Math.floor(Math.random() * colors.length)];
+  this.alpha = Math.random() * 0.4 + 0.1;
+  this.alphaDir = (Math.random() - 0.5) * 0.003;
+}
+
+function init() {
+  resize();
+  particles = [];
+  for (let i = 0; i < 90; i++) particles.push(new Particle());
+}
+
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+  particles.forEach(p => {
+    p.x += p.speedX;
+    p.y += p.speedY;
+    p.alpha += p.alphaDir;
+    if (p.alpha <= 0.05 || p.alpha >= 0.55) p.alphaDir *= -1;
+    if (p.x < 0) p.x = W;
+    if (p.x > W) p.x = 0;
+    if (p.y < 0) p.y = H;
+    if (p.y > H) p.y = 0;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+    ctx.fillStyle = p.color + p.alpha + ')';
+    ctx.fill();
+  });
+  requestAnimationFrame(draw);
+}
+
+init();
+draw();
+window.addEventListener('resize', init);
+
+// ── TOGGLE ──
+function toggle(id) {
+  document.querySelectorAll('.detail').forEach(p => {
+    if (p.id !== id) p.classList.remove('open');
+  });
+  const el = document.getElementById(id);
+  el.classList.toggle('open');
+  if (el.classList.contains('open')) {
+    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
+}
 </script>
 </body>
 </html>
